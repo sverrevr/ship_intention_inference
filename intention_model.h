@@ -9,21 +9,17 @@
 #include <math.h>
 #include <optional>
 #include <algorithm>
-#include <ros/time.h>
-#include <ros/duration.h>
-#include <ros/ros.h>
 #include <iostream>
 #include <fstream>
-#include <custom_msgs/IntentionNodeState.h>
-#include <custom_msgs/IntentionNodeStateSingleShip.h>
-#include <custom_msgs/IntentionMeasurement.h>
-#include <custom_msgs/IntentionMeasurementSingleShip.h>
-
 #include "bayesian_network.h"
 #include "identifiers.h"
 #include "geometry.h"
 #include "parameters.h"
 #include "utils.h"
+
+//TODO fiks:
+// ros::Time::now() <- tidspunktet for denne målingen
+// custom_msgs::... <- er bare brukt for å vise frem resultatet, kan fjernes (erstattes?)
 
 namespace INTENTION_INFERENCE
 {
@@ -328,94 +324,94 @@ namespace INTENTION_INFERENCE
 			return did_save;
 		}
 
-		double evaluateTrajectory(const Eigen::MatrixXd &trajectory, const std::map<int, Eigen::Vector4d> &ship_states, std::vector<int> currently_tracked_ships, double dt, custom_msgs::IntentionMeasurement *measurement_msgs)
-		{
-			measurement_msgs->header.stamp = ros::Time::now();
+		// double evaluateTrajectory(const Eigen::MatrixXd &trajectory, const std::map<int, Eigen::Vector4d> &ship_states, std::vector<int> currently_tracked_ships, double dt, custom_msgs::IntentionMeasurement *measurement_msgs)
+		// {
+		// 	measurement_msgs->header.stamp = ros::Time::now();
 
-			measurement_msgs->reference_ship_id = my_id;
+		// 	measurement_msgs->reference_ship_id = my_id;
 
-			net.incrementTime();
+		// 	net.incrementTime();
 
-			unsigned steps_into_trajectory = parameters.time_into_trajectory;
+		// 	unsigned steps_into_trajectory = parameters.time_into_trajectory;
 
-			measurement_msgs->change_in_course_deg = RAD2DEG * (trajectory(CHI, steps_into_trajectory) - better_at(initial_ship_states, my_id)[CHI]);
-			measurement_msgs->change_in_course_state_name = changeInCourseIdentifier(parameters, trajectory(CHI, steps_into_trajectory), better_at(initial_ship_states, my_id)[CHI]);
-			net.setEvidence("change_in_course", changeInCourseIdentifier(parameters, trajectory(CHI, steps_into_trajectory), better_at(initial_ship_states, my_id)[CHI]));
+		// 	measurement_msgs->change_in_course_deg = RAD2DEG * (trajectory(CHI, steps_into_trajectory) - better_at(initial_ship_states, my_id)[CHI]);
+		// 	measurement_msgs->change_in_course_state_name = changeInCourseIdentifier(parameters, trajectory(CHI, steps_into_trajectory), better_at(initial_ship_states, my_id)[CHI]);
+		// 	net.setEvidence("change_in_course", changeInCourseIdentifier(parameters, trajectory(CHI, steps_into_trajectory), better_at(initial_ship_states, my_id)[CHI]));
 
-			measurement_msgs->change_in_speed_m_s = trajectory(U, steps_into_trajectory) - better_at(initial_ship_states, my_id)[U];
-			measurement_msgs->change_in_speed_state_name = changeInSpeedIdentifier(parameters, trajectory(U, steps_into_trajectory), better_at(initial_ship_states, my_id)[U]);
-			net.setEvidence("change_in_speed", changeInSpeedIdentifier(parameters, trajectory(U, steps_into_trajectory), better_at(initial_ship_states, my_id)[U]));
+		// 	measurement_msgs->change_in_speed_m_s = trajectory(U, steps_into_trajectory) - better_at(initial_ship_states, my_id)[U];
+		// 	measurement_msgs->change_in_speed_state_name = changeInSpeedIdentifier(parameters, trajectory(U, steps_into_trajectory), better_at(initial_ship_states, my_id)[U]);
+		// 	net.setEvidence("change_in_speed", changeInSpeedIdentifier(parameters, trajectory(U, steps_into_trajectory), better_at(initial_ship_states, my_id)[U]));
 
-			measurement_msgs->is_changing_course = false;
-			net.setEvidence("is_changing_course", false);
+		// 	measurement_msgs->is_changing_course = false;
+		// 	net.setEvidence("is_changing_course", false);
 
-			measurement_msgs->ship_measurements.clear();
-			std::vector<std::string> handled_ship_names;
-			for (auto const ship_id : currently_tracked_ships)
-			{
-				if (ship_id != my_id)
-				{
-					std::string ship_name = better_at(ship_name_map, ship_id);
-					handled_ship_names.push_back(ship_name);
-					const auto ship_state = better_at(ship_states, ship_id);
-					custom_msgs::IntentionMeasurementSingleShip single_ship_meas_msg;
-					single_ship_meas_msg.measured_ship_id = ship_id;
+		// 	measurement_msgs->ship_measurements.clear();
+		// 	std::vector<std::string> handled_ship_names;
+		// 	for (auto const ship_id : currently_tracked_ships)
+		// 	{
+		// 		if (ship_id != my_id)
+		// 		{
+		// 			std::string ship_name = better_at(ship_name_map, ship_id);
+		// 			handled_ship_names.push_back(ship_name);
+		// 			const auto ship_state = better_at(ship_states, ship_id);
+		// 			custom_msgs::IntentionMeasurementSingleShip single_ship_meas_msg;
+		// 			single_ship_meas_msg.measured_ship_id = ship_id;
 
-					net.setEvidence("disable_" + ship_name, "enabled");
+		// 			net.setEvidence("disable_" + ship_name, "enabled");
 
-					CPA cpa = evaluateCPA(trajectory, ship_state, dt);
-					auto minimum_acceptable_ample_time = parameters.ample_time_s.minimal_accepted_by_ownship;
+		// 			CPA cpa = evaluateCPA(trajectory, ship_state, dt);
+		// 			auto minimum_acceptable_ample_time = parameters.ample_time_s.minimal_accepted_by_ownship;
 
-					single_ship_meas_msg.time_untill_CPA_sec = minimum_acceptable_ample_time;
-					single_ship_meas_msg.time_untill_CPA_state_id = timeIdentifier(parameters, minimum_acceptable_ample_time);
-					net.setEvidence("time_untill_closest_point_of_approach_towards_" + ship_name, timeIdentifier(parameters, minimum_acceptable_ample_time));
+		// 			single_ship_meas_msg.time_untill_CPA_sec = minimum_acceptable_ample_time;
+		// 			single_ship_meas_msg.time_untill_CPA_state_id = timeIdentifier(parameters, minimum_acceptable_ample_time);
+		// 			net.setEvidence("time_untill_closest_point_of_approach_towards_" + ship_name, timeIdentifier(parameters, minimum_acceptable_ample_time));
 
-					single_ship_meas_msg.distance_at_CPA_m = cpa.distance_at_CPA;
-					single_ship_meas_msg.distance_at_CPA_state_id = highresCPADistanceIdentifier(parameters, cpa.distance_at_CPA);
-					net.setEvidence("distance_at_cpa_towards_" + ship_name, highresCPADistanceIdentifier(parameters, cpa.distance_at_CPA));
+		// 			single_ship_meas_msg.distance_at_CPA_m = cpa.distance_at_CPA;
+		// 			single_ship_meas_msg.distance_at_CPA_state_id = highresCPADistanceIdentifier(parameters, cpa.distance_at_CPA);
+		// 			net.setEvidence("distance_at_cpa_towards_" + ship_name, highresCPADistanceIdentifier(parameters, cpa.distance_at_CPA));
 
-					double crossing_in_front_distance = crossingInFrontDistanceTrajectory(trajectory, ship_state, dt);
+		// 			double crossing_in_front_distance = crossingInFrontDistanceTrajectory(trajectory, ship_state, dt);
 
-					single_ship_meas_msg.crossing_distance_front_m = crossing_in_front_distance;
-					single_ship_meas_msg.crossing_distance_front_state_id = crossInFrontHighresIdentifier(parameters, crossing_in_front_distance);
-					net.setEvidence("crossing_distance_front_towards_" + ship_name, crossInFrontHighresIdentifier(parameters, crossing_in_front_distance));
+		// 			single_ship_meas_msg.crossing_distance_front_m = crossing_in_front_distance;
+		// 			single_ship_meas_msg.crossing_distance_front_state_id = crossInFrontHighresIdentifier(parameters, crossing_in_front_distance);
+		// 			net.setEvidence("crossing_distance_front_towards_" + ship_name, crossInFrontHighresIdentifier(parameters, crossing_in_front_distance));
 
-					auto distanceToMidpointResult = distanceToMidpointTrajectory(trajectory, ship_state, dt);
-					single_ship_meas_msg.two_times_distance_to_midpoint_at_cpa_to_m = distanceToMidpointResult.distance_to_midpoint;
-					single_ship_meas_msg.two_times_distance_to_midpoint_at_cpa_to_state_id = twotimesDistanceToMidpointIdentifier(parameters, distanceToMidpointResult.distance_to_midpoint);
-					net.setEvidence("two_times_distance_to_midpoint_at_cpa_to_" + ship_name, twotimesDistanceToMidpointIdentifier(parameters, distanceToMidpointResult.distance_to_midpoint));
+		// 			auto distanceToMidpointResult = distanceToMidpointTrajectory(trajectory, ship_state, dt);
+		// 			single_ship_meas_msg.two_times_distance_to_midpoint_at_cpa_to_m = distanceToMidpointResult.distance_to_midpoint;
+		// 			single_ship_meas_msg.two_times_distance_to_midpoint_at_cpa_to_state_id = twotimesDistanceToMidpointIdentifier(parameters, distanceToMidpointResult.distance_to_midpoint);
+		// 			net.setEvidence("two_times_distance_to_midpoint_at_cpa_to_" + ship_name, twotimesDistanceToMidpointIdentifier(parameters, distanceToMidpointResult.distance_to_midpoint));
 
-					single_ship_meas_msg.crossing_with_midpoint_on_side = crossingWithMidpointOnSideIdentifier(distanceToMidpointResult.crossing_with_midpoint_on_port_side);
-					net.setEvidence("crossing_with_midpoint_on_side_"+ship_name, crossingWithMidpointOnSideIdentifier(distanceToMidpointResult.crossing_with_midpoint_on_port_side));
+		// 			single_ship_meas_msg.crossing_with_midpoint_on_side = crossingWithMidpointOnSideIdentifier(distanceToMidpointResult.crossing_with_midpoint_on_port_side);
+		// 			net.setEvidence("crossing_with_midpoint_on_side_"+ship_name, crossingWithMidpointOnSideIdentifier(distanceToMidpointResult.crossing_with_midpoint_on_port_side));
 
-					single_ship_meas_msg.aft_front_crossing_side = frontAftIdentifier(cpa.passing_in_front);
-					net.setEvidence("aft_front_crossing_side_to_" + ship_name, frontAftIdentifier(cpa.passing_in_front));
+		// 			single_ship_meas_msg.aft_front_crossing_side = frontAftIdentifier(cpa.passing_in_front);
+		// 			net.setEvidence("aft_front_crossing_side_to_" + ship_name, frontAftIdentifier(cpa.passing_in_front));
 
-					single_ship_meas_msg.passed = hasPassedIdentifier(cpa.time_untill_CPA);
-					net.setEvidence("passed_" + ship_name, hasPassedIdentifier(cpa.time_untill_CPA));
+		// 			single_ship_meas_msg.passed = hasPassedIdentifier(cpa.time_untill_CPA);
+		// 			net.setEvidence("passed_" + ship_name, hasPassedIdentifier(cpa.time_untill_CPA));
 
-					single_ship_meas_msg.port_starboard_crossing_side = crossing_port_starboard_identifier(cpa.bearing_relative_to_heading);
-					net.setEvidence("crossing_wiht_other_on_port_side_to_" + ship_name, crossing_port_starboard_identifier(cpa.bearing_relative_to_heading));
+		// 			single_ship_meas_msg.port_starboard_crossing_side = crossing_port_starboard_identifier(cpa.bearing_relative_to_heading);
+		// 			net.setEvidence("crossing_wiht_other_on_port_side_to_" + ship_name, crossing_port_starboard_identifier(cpa.bearing_relative_to_heading));
 
-					measurement_msgs->ship_measurements.push_back(single_ship_meas_msg);
-				}
-			}
+		// 			measurement_msgs->ship_measurements.push_back(single_ship_meas_msg);
+		// 		}
+		// 	}
 
-			for (const auto ship_name : ship_names)
-			{
-				if (!std::count(handled_ship_names.begin(), handled_ship_names.end(), ship_name))
-				{
-					net.setEvidence("disable_" + ship_name, "disabled");
-				}
-			}
+		// 	for (const auto ship_name : ship_names)
+		// 	{
+		// 		if (!std::count(handled_ship_names.begin(), handled_ship_names.end(), ship_name))
+		// 		{
+		// 			net.setEvidence("disable_" + ship_name, "disabled");
+		// 		}
+		// 	}
 
-			// evaluate_nodes(node_state_msg);
-			auto res = net.evaluateStates({output_name});
-			measurement_msgs->probability_of_observation = better_at(better_at(res, output_name), "true");
+		// 	// evaluate_nodes(node_state_msg);
+		// 	auto res = net.evaluateStates({output_name});
+		// 	measurement_msgs->probability_of_observation = better_at(better_at(res, output_name), "true");
 
-			net.decrementTime();
-			return better_at(better_at(res, output_name), "true");
-		}
+		// 	net.decrementTime();
+		// 	return better_at(better_at(res, output_name), "true");
+		// }
 
 		/*auto run_inference(const std::map<int, Eigen::Vector4d> &ship_states, std::map<int, Eigen::MatrixXd> trajectory_candidates, double dt)
 	{

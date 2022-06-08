@@ -3,7 +3,6 @@ This file contains functions that translates continious values into discrete sta
 */
 
 #pragma once
-#include <ros/ros.h>
 #include <math.h>
 #include <map>
 #include <algorithm>

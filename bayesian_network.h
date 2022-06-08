@@ -111,7 +111,7 @@ public:
 
     void init(std::string file_name, unsigned num_network_evaluation_samples){
         DSL_errorH().RedirectToFile(stdout); //Rederects errors to standard output
-        std::string full_path = ros::package::getPath("intent_inference")+file_name;
+        std::string full_path = file_name;
         const auto result = net.ReadFile(full_path.c_str());
         if(result<0) printf("ERROR: Unable to read file: \"%s\"", full_path.c_str());
         assert(result>=0);
@@ -125,7 +125,7 @@ public:
     }
 
     void save_network(std::string file_name){
-        std::string full_path = ros::package::getPath("intent_inference")+"/include/"+file_name+".xdsl";
+        std::string full_path = file_name;
         const auto result = net.WriteFile(full_path.c_str());
         if(result<0) printf("ERROR: Unable to write file: \"%s\"", full_path.c_str());
         assert(result>=0);
