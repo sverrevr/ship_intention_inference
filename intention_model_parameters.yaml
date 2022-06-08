@@ -1,0 +1,66 @@
+#An approximate method is used to evaluate the BBN/DBN
+#This parameter specifies the precission, higher number means more precise.
+number_of_network_evaluation_samples: 100000
+
+#How far into trajecotry to see if there is course or speed change
+time_into_trajectory_s: 10
+
+#At what distance between the ships the intention model starts
+starting_distance_m: 400
+
+trajectory_prior_dist: [1.0, 1.5, 1.8, 1.5, 1.0]
+
+# If the course or speed change is larger than max over the specified period,
+# then the ship is currently changing course. Must be smaller than the expanding dbn parameter
+evaluate_course_change:
+  period_s: 6
+  max_course_change_deg: 7.5
+  max_speed_change_m_s: 0.5
+
+#Add a new timestep in the DBN no more often than min_time_s, and no seldomer than max_time_s
+#Within this interval, add a new timestep if there has been a significant course or speed change
+expanding_dbn:
+  min_time_s: 20
+  max_time_s: 12000
+  min_course_change_deg: 15
+  min_speed_change_m_s: 1
+
+#The normal distributions are discretized into 30 bins. Everything above the max value is in the highets bin. Max should probably be around mu+2sigma
+ample_time_s: #The ship must do an evasive action before ample time if it plans to give way
+  mu: 60
+  sigma: 7
+  max: 100
+  minimal_accepted_by_ownship: 20 #If the obstacle ship has a definition of ample time lower than this then the own ship should give way
+safe_distance_m:
+  mu: 15
+  sigma: 2.5
+  max: 30
+safe_distance_midpoint_m: #Used in HO-situations to ensure that both ships must give way. Considers safe distance to the current midpoint between the ships
+  mu: 15
+  sigma: 2.5
+  max: 30
+safe_distance_front_m: #How far in front of the other ship it can cross and be safe
+  mu: 20
+  sigma: 4
+  max: 50
+ignoring_safety_probability: 0 #Any behaviour not captured by the model, such as changing course that does not give way
+colregs_compliance_probability: 0.98  #If not colregs compliant, then the ship only needs to pass at a safe distance
+good_seamanship_probability: 0.99 #Prevents the ship from switching which side it is giving way towards
+unmodelled_behaviour_probability: 0.00001
+priority_probability:
+  lower: 0.05 #the ship allways gives way
+  similar: 0.9 #colregs defines whether it gives way
+  higher: 0.05 #it allways stands on
+change_in_course_deg: #Course change smaller than this is condisered as keeping course
+  minimal_change: 7.5
+change_in_speed_m_s: #Speed change smaller than this is considered as keeping speed
+  minimal_change: 1
+colregs_situation_borders_deg:
+  HO_uncertainty_start: 160
+  HO_start: 170
+  HO_stop: -170
+  HO_uncertainty_stop: -160
+  OT_uncertainty_start: 100
+  OT_start: 125
+  OT_stop: -125
+  OT_uncertainty_stop: -100
