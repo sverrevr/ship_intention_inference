@@ -20,6 +20,7 @@
 //TODO fiks:
 // ros::Time::now() <- tidspunktet for denne målingen
 // custom_msgs::... <- er bare brukt for å vise frem resultatet, kan fjernes (erstattes?)
+// putt inn tid som input i observation
 
 namespace INTENTION_INFERENCE
 {
