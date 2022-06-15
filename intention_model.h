@@ -2,10 +2,10 @@
 #pragma once
 
 #include <map>
-#include <Eigen/Dense>
+#include "Eigen/Dense"
 #include <string>
 #include <sstream>
-#include <boost/math/special_functions/sign.hpp>
+//#include <boost/math/special_functions/sign.hpp>
 #include <math.h>
 #include <optional>
 #include <algorithm>
@@ -41,12 +41,14 @@ namespace INTENTION_INFERENCE
 
 		const std::map<int, Eigen::Vector4d> initial_ship_states;
 		std::map<int, Eigen::Vector4d> previously_saved_ship_states;
-		std::map<int, ros::Time> time_last_saved_shipstate;
+		std::map<int, time_t> time_last_saved_shipstate;
 
-		bool doSave(const std::map<int, Eigen::Vector4d> &ship_states)
+		bool doSave(const std::map<int, Eigen::Vector4d> &ship_states, std::time_t time)
 		{
-			const auto min_time_between_saved_states = ros::Duration{parameters.expanding_dbn.min_time_s};
-			const auto max_time_between_saved_states = ros::Duration{parameters.expanding_dbn.max_time_s};
+			//const auto min_time_between_saved_states = ros::Duration{parameters.expanding_dbn.min_time_s};
+			//const auto max_time_between_saved_states = ros::Duration{parameters.expanding_dbn.max_time_s};
+			const auto min_time_between_saved_states = 20;
+			const auto max_time_between_saved_states = 1200;
 			const auto heading_change_to_save = parameters.expanding_dbn.min_course_change_rad;
 			const auto speed_change_to_save = parameters.expanding_dbn.min_speed_change_m_s;
 			if (!previously_saved_ship_states.size())
@@ -55,7 +57,7 @@ namespace INTENTION_INFERENCE
 				for (const auto &[ship_id, state] : previously_saved_ship_states)
 				{
 					(void)state; // discard state to avoid compiler warning for unused variable
-					time_last_saved_shipstate[ship_id] = ros::Time::now();
+					time_last_saved_shipstate[ship_id] = time;
 				}
 				return false;
 			}
@@ -64,11 +66,11 @@ namespace INTENTION_INFERENCE
 				for (auto const &[ship_id, current_ship_state] : ship_states)
 				{
 					const auto &past_ship_state = better_at(previously_saved_ship_states, ship_id);
-					const auto time_passed = ros::Time::now() - better_at(time_last_saved_shipstate, ship_id);
+					const auto time_passed = time - better_at(time_last_saved_shipstate, ship_id);
 					if (time_passed > min_time_between_saved_states && (time_passed > max_time_between_saved_states || std::abs(current_ship_state[CHI] - past_ship_state[CHI]) > heading_change_to_save || std::abs(current_ship_state[U] - past_ship_state[U]) > speed_change_to_save))
 					{
 						previously_saved_ship_states = ship_states;
-						time_last_saved_shipstate[ship_id] = ros::Time::now();
+						time_last_saved_shipstate[ship_id] = time;
 						return true;
 					}
 				}
@@ -76,7 +78,7 @@ namespace INTENTION_INFERENCE
 			return false;
 		}
 
-		void evaluate_nodes(custom_msgs::IntentionNodeState *node_state_msg)
+		/*void evaluate_nodes(custom_msgs::IntentionNodeState *node_state_msg)
 		{
 			node_state_msg->header.stamp = ros::Time::now();
 			node_state_msg->reference_ship_id = my_id;
@@ -141,7 +143,7 @@ namespace INTENTION_INFERENCE
 					node_state_msg->ship_intermediate_nodes.push_back(node_state_single_ship_msg);
 				}
 			}
-		}
+		}*/
 
 	public:
 		IntentionModel(std::string network_file_name, const IntentionModelParameters &parameters, int my_id, const std::map<int, Eigen::Vector4d> &ship_states) : IntentionModel(network_file_name, parameters, my_id, ship_states, std::map<std::string, std::string>{}) {}
@@ -230,36 +232,36 @@ namespace INTENTION_INFERENCE
 			net.save_network("network_with_config_probabilities");
 		}
 
-		bool insertObservation(const std::map<int, Eigen::Vector4d> &ship_states, std::vector<int> currently_tracked_ships, bool is_changing_course, custom_msgs::IntentionNodeState *node_state_msg, custom_msgs::IntentionMeasurement *measurement_msgs)
+		bool insertObservation(const std::map<int, Eigen::Vector4d> &ship_states, std::vector<int> currently_tracked_ships, bool is_changing_course, std::time_t time)
 		{
-			node_state_msg->header.stamp = ros::Time::now();
-			measurement_msgs->header.stamp = ros::Time::now();
+			//node_state_msg->header.stamp = ros::Time::now();
+			//measurement_msgs->header.stamp = ros::Time::now();
 
-			node_state_msg->reference_ship_id = my_id;
-			measurement_msgs->reference_ship_id = my_id;
+			//node_state_msg->reference_ship_id = my_id;
+			//measurement_msgs->reference_ship_id = my_id;
 
 			bool did_save = false;
 
-			if (doSave(ship_states))
+			if (doSave(ship_states, time))
 			{
 				net.incrementTime();
 				did_save = true;
 			}
 
-			node_state_msg->number_of_timesteps = net.getNumberOfTimeSteps();
+			//node_state_msg->number_of_timesteps = net.getNumberOfTimeSteps();
 
-			measurement_msgs->change_in_course_deg = RAD2DEG * (better_at(ship_states, my_id)[CHI] - better_at(initial_ship_states, my_id)[CHI]);
-			measurement_msgs->change_in_course_state_name = changeInCourseIdentifier(parameters, better_at(ship_states, my_id)[CHI], better_at(initial_ship_states, my_id)[CHI]);
+			//measurement_msgs->change_in_course_deg = RAD2DEG * (better_at(ship_states, my_id)[CHI] - better_at(initial_ship_states, my_id)[CHI]);
+			//measurement_msgs->change_in_course_state_name = changeInCourseIdentifier(parameters, better_at(ship_states, my_id)[CHI], better_at(initial_ship_states, my_id)[CHI]);
 			net.setEvidence("change_in_course", changeInCourseIdentifier(parameters, better_at(ship_states, my_id)[CHI], better_at(initial_ship_states, my_id)[CHI]));
 
-			measurement_msgs->change_in_speed_m_s = better_at(ship_states, my_id)[U] - better_at(initial_ship_states, my_id)[U];
-			measurement_msgs->change_in_speed_state_name = changeInSpeedIdentifier(parameters, better_at(ship_states, my_id)[U], better_at(initial_ship_states, my_id)[U]);
+			//measurement_msgs->change_in_speed_m_s = better_at(ship_states, my_id)[U] - better_at(initial_ship_states, my_id)[U];
+			//measurement_msgs->change_in_speed_state_name = changeInSpeedIdentifier(parameters, better_at(ship_states, my_id)[U], better_at(initial_ship_states, my_id)[U]);
 			net.setEvidence("change_in_speed", changeInSpeedIdentifier(parameters, better_at(ship_states, my_id)[U], better_at(initial_ship_states, my_id)[U]));
 
-			measurement_msgs->is_changing_course = is_changing_course;
+			//measurement_msgs->is_changing_course = is_changing_course;
 			net.setEvidence("is_changing_course", is_changing_course);
 
-			measurement_msgs->ship_measurements.clear();
+			//measurement_msgs->ship_measurements.clear();
 
 			std::vector<std::string> handled_ship_names;
 			for (auto const &ship_id : currently_tracked_ships)
@@ -269,45 +271,45 @@ namespace INTENTION_INFERENCE
 					const std::string ship_name = better_at(ship_name_map, ship_id);
 					const auto ship_state = better_at(ship_states, ship_id);
 					handled_ship_names.push_back(ship_name);
-					custom_msgs::IntentionMeasurementSingleShip single_ship_meas_msg;
-					single_ship_meas_msg.measured_ship_id = ship_id;
+					//custom_msgs::IntentionMeasurementSingleShip single_ship_meas_msg;
+					//single_ship_meas_msg.measured_ship_id = ship_id;
 
 					CPA cpa = evaluateCPA(better_at(ship_states, my_id), ship_state);
 
 					net.setEvidence("disable_" + ship_name, "enabled");
 
-					single_ship_meas_msg.time_untill_CPA_sec = cpa.time_untill_CPA;
-					single_ship_meas_msg.time_untill_CPA_state_id = timeIdentifier(parameters, cpa.time_untill_CPA);
+					//single_ship_meas_msg.time_untill_CPA_sec = cpa.time_untill_CPA;
+					//single_ship_meas_msg.time_untill_CPA_state_id = timeIdentifier(parameters, cpa.time_untill_CPA);
 					net.setEvidence("time_untill_closest_point_of_approach_towards_" + ship_name, timeIdentifier(parameters, cpa.time_untill_CPA));
 
-					single_ship_meas_msg.distance_at_CPA_m = cpa.distance_at_CPA;
-					single_ship_meas_msg.distance_at_CPA_state_id = highresCPADistanceIdentifier(parameters, cpa.distance_at_CPA);
+					//single_ship_meas_msg.distance_at_CPA_m = cpa.distance_at_CPA;
+					//single_ship_meas_msg.distance_at_CPA_state_id = highresCPADistanceIdentifier(parameters, cpa.distance_at_CPA);
 					net.setEvidence("distance_at_cpa_towards_" + ship_name, highresCPADistanceIdentifier(parameters, cpa.distance_at_CPA));
 
 					double crossing_in_front_distance = crossingInFrontDistance(better_at(ship_states, my_id), ship_state);
 
-					single_ship_meas_msg.crossing_distance_front_m = crossing_in_front_distance;
-					single_ship_meas_msg.crossing_distance_front_state_id = crossInFrontHighresIdentifier(parameters, crossing_in_front_distance);
+					//single_ship_meas_msg.crossing_distance_front_m = crossing_in_front_distance;
+					//single_ship_meas_msg.crossing_distance_front_state_id = crossInFrontHighresIdentifier(parameters, crossing_in_front_distance);
 					net.setEvidence("crossing_distance_front_towards_" + ship_name, crossInFrontHighresIdentifier(parameters, crossing_in_front_distance));
 
 					auto distanceToMidpointResult = distanceToMidpointCourse(better_at(ship_states, my_id), ship_state);
-					single_ship_meas_msg.two_times_distance_to_midpoint_at_cpa_to_m = distanceToMidpointResult.distance_to_midpoint;
-					single_ship_meas_msg.two_times_distance_to_midpoint_at_cpa_to_state_id = twotimesDistanceToMidpointIdentifier(parameters, distanceToMidpointResult.distance_to_midpoint);
+					//single_ship_meas_msg.two_times_distance_to_midpoint_at_cpa_to_m = distanceToMidpointResult.distance_to_midpoint;
+					//single_ship_meas_msg.two_times_distance_to_midpoint_at_cpa_to_state_id = twotimesDistanceToMidpointIdentifier(parameters, distanceToMidpointResult.distance_to_midpoint);
 					net.setEvidence("two_times_distance_to_midpoint_at_cpa_to_" + ship_name, twotimesDistanceToMidpointIdentifier(parameters, distanceToMidpointResult.distance_to_midpoint));
 
-					single_ship_meas_msg.crossing_with_midpoint_on_side = crossingWithMidpointOnSideIdentifier(distanceToMidpointResult.crossing_with_midpoint_on_port_side);
+					//single_ship_meas_msg.crossing_with_midpoint_on_side = crossingWithMidpointOnSideIdentifier(distanceToMidpointResult.crossing_with_midpoint_on_port_side);
 					net.setEvidence("crossing_with_midpoint_on_side_"+ship_name, crossingWithMidpointOnSideIdentifier(distanceToMidpointResult.crossing_with_midpoint_on_port_side));
 
-					single_ship_meas_msg.aft_front_crossing_side = frontAftIdentifier(cpa.passing_in_front);
+					//single_ship_meas_msg.aft_front_crossing_side = frontAftIdentifier(cpa.passing_in_front);
 					net.setEvidence("aft_front_crossing_side_to_" + ship_name, frontAftIdentifier(cpa.passing_in_front));
 
-					single_ship_meas_msg.passed = hasPassedIdentifier(cpa.time_untill_CPA);
+					//single_ship_meas_msg.passed = hasPassedIdentifier(cpa.time_untill_CPA);
 					net.setEvidence("passed_" + ship_name, hasPassedIdentifier(cpa.time_untill_CPA));
 
-					single_ship_meas_msg.port_starboard_crossing_side = crossing_port_starboard_identifier(cpa.bearing_relative_to_heading);
+					//single_ship_meas_msg.port_starboard_crossing_side = crossing_port_starboard_identifier(cpa.bearing_relative_to_heading);
 					net.setEvidence("crossing_wiht_other_on_port_side_to_" + ship_name, crossing_port_starboard_identifier(cpa.bearing_relative_to_heading));
 
-					measurement_msgs->ship_measurements.push_back(single_ship_meas_msg);
+					//measurement_msgs->ship_measurements.push_back(single_ship_meas_msg);
 				}
 			}
 
@@ -320,7 +322,7 @@ namespace INTENTION_INFERENCE
 			}
 
 			net.setEvidence(output_name, "true");
-			evaluate_nodes(node_state_msg);
+			//evaluate_nodes(node_state_msg);
 
 			return did_save;
 		}
