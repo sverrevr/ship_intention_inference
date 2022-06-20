@@ -12,53 +12,7 @@
 #include "Eigen/Dense"
 #include <map>
 
-/*const INTENTION_INFERENCE::IntentionModelParameters intention_model_parameters = [&]
-	{
-		INTENTION_INFERENCE::IntentionModelParameters param;
-		param.number_of_network_evaluation_samples = 100000;
-		param.max_number_of_obstacles = 10;
-		param.time_into_trajectory = 10;
-		param.expanding_dbn.min_time_s = 10;
-		param.expanding_dbn.max_time_s = 1200;
-		param.expanding_dbn.min_course_change_rad = 7.5;
-		param.expanding_dbn.min_speed_change_m_s = 0.5;
-		param.ample_time_s.mu = 60;
-		param.ample_time_s.sigma = 7;
-		param.ample_time_s.max = 100;
-		param.ample_time_s.n_bins = 30; // this value must match the bayesian network
-		param.ample_time_s.minimal_accepted_by_ownship = 20;
-		param.safe_distance_m.mu = 15;
-		param.safe_distance_m.sigma = 2.5;
-		param.safe_distance_m.max = 30;
-		param.safe_distance_m.n_bins = 30; // this value must match the bayesian network
-		param.safe_distance_midpoint_m.mu = 15;
-		param.safe_distance_midpoint_m.sigma = 2.5;
-		param.safe_distance_midpoint_m.max = 30;
-		param.safe_distance_midpoint_m.n_bins = 30; // this value must match the bayesian network
-		param.safe_distance_front_m.mu = 20;
-		param.safe_distance_front_m.sigma = 4;
-		param.safe_distance_front_m.max = 50;
-		param.safe_distance_front_m.n_bins = 30; // this value must match the bayesian network
-		param.change_in_course_rad.minimal_change = 7.5;
-		param.change_in_speed_m_s.minimal_change = 1;
-		param.colregs_situation_borders_rad.HO_uncertainty_start = 160;
-		param.colregs_situation_borders_rad.HO_start = 170;
-		param.colregs_situation_borders_rad.HO_stop = -170;
-		param.colregs_situation_borders_rad.HO_uncertainty_stop = -160;
-		param.colregs_situation_borders_rad.OT_uncertainty_start = 100;
-		param.colregs_situation_borders_rad.OT_start = 125;
-		param.colregs_situation_borders_rad.OT_stop = -125;
-		param.colregs_situation_borders_rad.OT_uncertainty_stop = -100;
-		param.ignoring_safety_probability = 0;
-		param.colregs_compliance_probability = 0.98;
-		param.good_seamanship_probability = 0.99;
-		param.unmodeled_behaviour = 0.00001;
-		param.priority_probability["lower"] = 0.05;
-		param.priority_probability["similar"] = 0.9;
-		param.priority_probability["higher"] = 0.05;
 
-		return param;
-	}();*/
 
 
 int main(){
@@ -112,7 +66,7 @@ int main(){
 	int num_ships = 2;
     
 
-    std::ifstream ifile("files/new_case_LQLVS-60-sec.csv");
+    std::ifstream ifile("new_case_LQLVS-60-sec.csv");
     std::vector<int> mmsi_vec;
     std::vector<time_t> time_vec;
 	std::vector<time_t> new_time_vec;
@@ -134,7 +88,7 @@ int main(){
             std::istringstream ss(token);
             ss >> std::get_time(&td, "%Y-%m-%d %H:%M:%S"); // or just %T in this case
             std::time_t time = mktime(&td);
-            std::tm local = *std::localtime(&time);
+            //std::tm local = *std::localtime(&time);
             //std::cout << "local: " << std::put_time(&local, "%c %Z") << '\n';
             //std::cout << token << std::endl;
             //std::cout << time << std::endl;
@@ -164,18 +118,16 @@ int main(){
 	
 
 	for (int i = 0; i < time_vec.size()/num_ships; i++ ) {
-		for (int j = time_vec.size()/num_ships; j < time_vec.size(); j++){
-			if (time_vec[i] == time_vec[j]) {
-				std::map<int, Eigen::Vector4d> current_ship_states;
-            	Eigen::Vector4d states_i(x_vec[i],y_vec[i],sog_vec[i],cog_vec[i]);
-				Eigen::Vector4d states_j(x_vec[j],y_vec[j],sog_vec[j],cog_vec[j]);
-            	std::map<int,Eigen::Vector4d>::iterator it = current_ship_states.end();
-            	current_ship_states.insert(it, std::pair<int, Eigen::Vector4d>(mmsi_vec[i],states_i));
-				current_ship_states.insert(it, std::pair<int, Eigen::Vector4d>(mmsi_vec[j],states_j));
-            	ship_state.push_back(current_ship_states);
+        std::map<int, Eigen::Vector4d> current_ship_states;
+        for (int c = 0; c < num_ships; c++){
+            int index = c*time_vec.size()/num_ships + i;
+            Eigen::Vector4d states(x_vec[index],y_vec[index],sog_vec[index],cog_vec[index]);
+            std::map<int,Eigen::Vector4d>::iterator it = current_ship_states.end();
+            current_ship_states.insert(it, std::pair<int, Eigen::Vector4d>(mmsi_vec[index],states));
+        }
+        ship_state.push_back(current_ship_states);
 				new_time_vec.push_back(time_vec[i]);
-				 }
-    } 
+
     }
      
     
@@ -206,7 +158,7 @@ int main(){
         //std::cout << ship_list[ship] << std::endl;
     //}
 
-    std::map<int, INTENTION_INFERENCE::IntentionModel> ship_intentions;
+    //std::map<int, INTENTION_INFERENCE::IntentionModel> ship_intentions;
     //ship_intentions.insert(std::pair<int, INTENTION_INFERENCE::IntentionModel>(ship_list[0], INTENTION_INFERENCE::IntentionModel("intention_model_two_ships.xdsl",param,ship_list[0],ship_state[0])));
 
    //for(int i = 0; i < ship_state.size(); i++){
