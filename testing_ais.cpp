@@ -20,11 +20,11 @@ int main(){
 
     INTENTION_INFERENCE::IntentionModelParameters param;
 		param.number_of_network_evaluation_samples = 100000;
-		param.max_number_of_obstacles = 10;
+		param.max_number_of_obstacles = 1;
 		param.time_into_trajectory = 10;
 		param.expanding_dbn.min_time_s = 10;
 		param.expanding_dbn.max_time_s = 1200;
-		param.expanding_dbn.min_course_change_rad = 7.5;
+		param.expanding_dbn.min_course_change_rad = 0.13;
 		param.expanding_dbn.min_speed_change_m_s = 0.5;
 		param.ample_time_s.mu = 60;
 		param.ample_time_s.sigma = 7;
@@ -68,11 +68,12 @@ int main(){
 
     std::ifstream ifile("new_case_LQLVS-60-sec.csv");
     std::vector<int> mmsi_vec;
-    std::vector<time_t> time_vec;
-	std::vector<time_t> new_time_vec;
+    std::vector<double> time_vec;
+	std::vector<double> new_time_vec;
     std::vector<double> x_vec, y_vec, sog_vec, cog_vec;
     int mmsi;
     time_t time;
+    double time_1;
     double x, y, sog, cog;
     std::string str;
     if(ifile.is_open()){
@@ -88,6 +89,7 @@ int main(){
             std::istringstream ss(token);
             ss >> std::get_time(&td, "%Y-%m-%d %H:%M:%S"); // or just %T in this case
             std::time_t time = mktime(&td);
+            time_1 = time;
             //std::tm local = *std::localtime(&time);
             //std::cout << "local: " << std::put_time(&local, "%c %Z") << '\n';
             //std::cout << token << std::endl;
@@ -108,7 +110,7 @@ int main(){
             y_vec.push_back(y);
             sog_vec.push_back(sog);
             cog_vec.push_back(cog);
-            time_vec.push_back(time);
+            time_vec.push_back(time_1);
             
 
         }
@@ -121,7 +123,7 @@ int main(){
         std::map<int, Eigen::Vector4d> current_ship_states;
         for (int c = 0; c < num_ships; c++){
             int index = c*time_vec.size()/num_ships + i;
-            Eigen::Vector4d states(x_vec[index],y_vec[index],sog_vec[index],cog_vec[index]);
+            Eigen::Vector4d states(x_vec[index],y_vec[index],cog_vec[index],sog_vec[index]);
             std::map<int,Eigen::Vector4d>::iterator it = current_ship_states.end();
             current_ship_states.insert(it, std::pair<int, Eigen::Vector4d>(mmsi_vec[index],states));
         }
@@ -140,7 +142,7 @@ int main(){
         std::cout << "cog: " << cog_vec[i] << std::endl;
     }  */
 
-    for(int i = 0; i < ship_state.size(); i++){
+    for(int i = 1; i < 5; i++){
             for(auto it = ship_state[i].cbegin(); it != ship_state[i].cend(); ++it){
             std::cout << it->first << " -> " << it->second << std::endl;
             std::cout << " time: " << new_time_vec[i] << std::endl;
@@ -158,15 +160,21 @@ int main(){
         //std::cout << ship_list[ship] << std::endl;
     //}
 
-    //std::map<int, INTENTION_INFERENCE::IntentionModel> ship_intentions;
-    //ship_intentions.insert(std::pair<int, INTENTION_INFERENCE::IntentionModel>(ship_list[0], INTENTION_INFERENCE::IntentionModel("intention_model_two_ships.xdsl",param,ship_list[0],ship_state[0])));
+    std::map<int, INTENTION_INFERENCE::IntentionModel> ship_intentions;
+    ship_intentions.insert(std::pair<int, INTENTION_INFERENCE::IntentionModel>(ship_list[0], INTENTION_INFERENCE::IntentionModel("intention_model_two_ships.xdsl",param,ship_list[0],ship_state[1])));
+    ship_intentions.insert(std::pair<int, INTENTION_INFERENCE::IntentionModel>(ship_list[1], INTENTION_INFERENCE::IntentionModel("intention_model_two_ships.xdsl",param,ship_list[1],ship_state[1])));
 
-   //for(int i = 0; i < ship_state.size(); i++){
-       // for(auto& [ship_id, current_ship_intention_model] : ship_intentions){
-         //   current_ship_intention_model.insertObservation(ship_state[i],ship_list,false,new_time_vec[i]);
-        //}
-   // }
-   
+    
+    
+   for(int i = 10; i < 35; i++){
+        std::cout << "timestep: " << i << std::endl;
+       for(auto& [ship_id, current_ship_intention_model] : ship_intentions){
+        std::cout << "ship id:" << ship_id << std::endl;
+        current_ship_intention_model.insertObservation(ship_state[i],ship_list,false,new_time_vec[i]);
+    }
+   }
+
+    
     
     
 }

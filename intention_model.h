@@ -41,9 +41,9 @@ namespace INTENTION_INFERENCE
 
 		const std::map<int, Eigen::Vector4d> initial_ship_states;
 		std::map<int, Eigen::Vector4d> previously_saved_ship_states;
-		std::map<int, time_t> time_last_saved_shipstate;
+		std::map<int, double> time_last_saved_shipstate;
 
-		bool doSave(const std::map<int, Eigen::Vector4d> &ship_states, std::time_t time)
+		bool doSave(const std::map<int, Eigen::Vector4d> &ship_states, double time)
 		{
 			//const auto min_time_between_saved_states = ros::Duration{parameters.expanding_dbn.min_time_s};
 			//const auto max_time_between_saved_states = ros::Duration{parameters.expanding_dbn.max_time_s};
@@ -78,22 +78,66 @@ namespace INTENTION_INFERENCE
 			return false;
 		}
 
-		/*void evaluate_nodes(custom_msgs::IntentionNodeState *node_state_msg)
-		{
-			node_state_msg->header.stamp = ros::Time::now();
-			node_state_msg->reference_ship_id = my_id;
+		void evaluate_nodes(){
+			int reference_ship_id = my_id;
 
 			auto result = net.evaluateStates(all_node_names);
 
-			node_state_msg->intention_colregs_compliant = better_at(better_at(result, "intention_colregs_compliant"), "true");
-			node_state_msg->intention_ignoring_safety = better_at(better_at(result, "intention_ignoring_safety"), "true");
-			node_state_msg->intention_good_seamanship = better_at(better_at(result, "intention_good_seamanship"), "true");
-			node_state_msg->intention_unmodeled_behaviour = better_at(better_at(result, "unmodelled_behaviour"), "true");
-			node_state_msg->has_turned_portwards = better_at(better_at(result, "has_turned_portwards"), "true");
-			node_state_msg->has_turned_starboardwards = better_at(better_at(result, "has_turned_starboardwards"), "true");
+			auto intention_colregs_compliant = better_at(better_at(result, "intention_colregs_compliant"), "true");
+			std::cout << "intention_colregs_compliant: " << intention_colregs_compliant << std::endl;
+			auto intention_ignoring_safety = better_at(better_at(result, "intention_ignoring_safety"), "true");
+			auto intention_good_seamanship = better_at(better_at(result, "intention_good_seamanship"), "true");
+			std::cout << "intention_good_seamanship: " << intention_good_seamanship << std::endl;
+			auto intention_unmodeled_behaviour = better_at(better_at(result, "unmodelled_behaviour"), "true");
+			std::cout << "intention_unmodeled_behaviour: " << intention_unmodeled_behaviour << std::endl;
+			auto has_turned_portwards = better_at(better_at(result, "has_turned_portwards"), "true");
+			auto has_turned_starboardwards = better_at(better_at(result, "has_turned_starboardwards"), "true");
+			std::cout << "has_turned_starboardwards: " << has_turned_starboardwards << std::endl;
 			//node_state_msg->stands_on_correct = better_at(better_at(result, "stands_on_correct"), "true");
-			node_state_msg->stands_on_correct = better_at(better_at(result, "stands_on_correct"), "true");
-			node_state_msg->observation_applicable = better_at(better_at(result, "observation_applicable"), "true");
+			auto stands_on_correct = better_at(better_at(result, "stands_on_correct"), "true");
+			auto observation_applicable = better_at(better_at(result, "observation_applicable"), "true");
+
+			for (auto const &[ship_id, ship_name] : ship_name_map)
+			{
+				if (ship_id != my_id)
+				{
+					auto intention_colav_situation_HO = better_at(better_at(result, "colav_situation_towards_" + ship_name), "HO");
+					auto intention_colav_situation_CR_SS = better_at(better_at(result, "colav_situation_towards_" + ship_name), "CR_SS");
+					std::cout << "intention_colav_situation_CR_SS: " << intention_colav_situation_CR_SS << std::endl;
+					auto intention_colav_situation_CR_PS = better_at(better_at(result, "colav_situation_towards_" + ship_name), "CR_PS");
+					std::cout << "intention_colav_situation_CR_PS: " << intention_colav_situation_CR_PS << std::endl;
+					auto intention_colav_situation_OT_ing = better_at(better_at(result, "colav_situation_towards_" + ship_name), "OT_ing");
+					auto intention_colav_situation_OT_en = better_at(better_at(result, "colav_situation_towards_" + ship_name), "OT_en");
+
+					auto priority_intention_lower = better_at(better_at(result, "priority_intention_to_" + ship_name), "lower");
+					auto priority_intention_similar = better_at(better_at(result, "priority_intention_to_" + ship_name), "similar");
+					std::cout << "priority_intention_similar: " << priority_intention_similar << std::endl;
+					auto autopriority_intention_higher = better_at(better_at(result, "priority_intention_to_" + ship_name), "higher");
+				}
+			}
+
+		}
+
+		/*void evaluate_nodes() //custom_msgs::IntentionNodeState *node_state_msg
+		{
+			//header.stamp = ros::Time::now();
+			int reference_ship_id = my_id;
+
+			auto result = net.evaluateStates(all_node_names);
+
+			auto intention_colregs_compliant = better_at(better_at(result, "intention_colregs_compliant"), "true");
+			std::cout << "intention_colregs_compliant: " << intention_colregs_compliant << std::endl;
+			auto intention_ignoring_safety = better_at(better_at(result, "intention_ignoring_safety"), "true");
+			auto intention_good_seamanship = better_at(better_at(result, "intention_good_seamanship"), "true");
+			std::cout << "intention_good_seamanship: " << intention_good_seamanship << std::endl;
+			auto intention_unmodeled_behaviour = better_at(better_at(result, "unmodelled_behaviour"), "true");
+			std::cout << "intention_unmodeled_behaviour: " << intention_unmodeled_behaviour << std::endl;
+			auto has_turned_portwards = better_at(better_at(result, "has_turned_portwards"), "true");
+			auto has_turned_starboardwards = better_at(better_at(result, "has_turned_starboardwards"), "true");
+			std::cout << "has_turned_starboardwards: " << has_turned_starboardwards << std::endl;
+			//node_state_msg->stands_on_correct = better_at(better_at(result, "stands_on_correct"), "true");
+			auto stands_on_correct = better_at(better_at(result, "stands_on_correct"), "true");
+			auto observation_applicable = better_at(better_at(result, "observation_applicable"), "true");
 
 			// Convert from map to vector
 			std::transform(better_at(result, "intention_ample_time").begin(), better_at(result, "intention_ample_time").end(), std::back_inserter(node_state_msg->intention_ample_time), [](std::pair<std::string, double> v)
@@ -229,10 +273,10 @@ namespace INTENTION_INFERENCE
 			net.setPriorNormalDistribution("intention_safe_distance_midpoint", parameters.safe_distance_midpoint_m.mu, parameters.safe_distance_midpoint_m.sigma, parameters.safe_distance_midpoint_m.max / parameters.safe_distance_midpoint_m.n_bins);
 			net.setPriorNormalDistribution("intention_safe_distance_front", parameters.safe_distance_front_m.mu, parameters.safe_distance_front_m.sigma, parameters.safe_distance_front_m.max / parameters.safe_distance_front_m.n_bins);
 
-			net.save_network("network_with_config_probabilities");
+			//net.save_network("network_with_config_probabilities");
 		}
 
-		bool insertObservation(const std::map<int, Eigen::Vector4d> &ship_states, std::vector<int> currently_tracked_ships, bool is_changing_course, std::time_t time)
+		bool insertObservation(const std::map<int, Eigen::Vector4d> &ship_states, std::vector<int> currently_tracked_ships, bool is_changing_course, double time)
 		{
 			//node_state_msg->header.stamp = ros::Time::now();
 			//measurement_msgs->header.stamp = ros::Time::now();
@@ -253,7 +297,7 @@ namespace INTENTION_INFERENCE
 			//measurement_msgs->change_in_course_deg = RAD2DEG * (better_at(ship_states, my_id)[CHI] - better_at(initial_ship_states, my_id)[CHI]);
 			//measurement_msgs->change_in_course_state_name = changeInCourseIdentifier(parameters, better_at(ship_states, my_id)[CHI], better_at(initial_ship_states, my_id)[CHI]);
 			net.setEvidence("change_in_course", changeInCourseIdentifier(parameters, better_at(ship_states, my_id)[CHI], better_at(initial_ship_states, my_id)[CHI]));
-
+			//std::cout << "change course: " << changeInCourseIdentifier(parameters, better_at(ship_states, my_id)[CHI], better_at(initial_ship_states, my_id)[CHI]) << std::endl;
 			//measurement_msgs->change_in_speed_m_s = better_at(ship_states, my_id)[U] - better_at(initial_ship_states, my_id)[U];
 			//measurement_msgs->change_in_speed_state_name = changeInSpeedIdentifier(parameters, better_at(ship_states, my_id)[U], better_at(initial_ship_states, my_id)[U]);
 			net.setEvidence("change_in_speed", changeInSpeedIdentifier(parameters, better_at(ship_states, my_id)[U], better_at(initial_ship_states, my_id)[U]));
@@ -271,6 +315,7 @@ namespace INTENTION_INFERENCE
 					const std::string ship_name = better_at(ship_name_map, ship_id);
 					const auto ship_state = better_at(ship_states, ship_id);
 					handled_ship_names.push_back(ship_name);
+					//std::cout << "ship_id " << ship_id << std::endl;
 					//custom_msgs::IntentionMeasurementSingleShip single_ship_meas_msg;
 					//single_ship_meas_msg.measured_ship_id = ship_id;
 
@@ -278,11 +323,12 @@ namespace INTENTION_INFERENCE
 
 					net.setEvidence("disable_" + ship_name, "enabled");
 
-					//single_ship_meas_msg.time_untill_CPA_sec = cpa.time_untill_CPA;
+					//std::cout <<cpa.time_untill_CPA << std::endl;
 					//single_ship_meas_msg.time_untill_CPA_state_id = timeIdentifier(parameters, cpa.time_untill_CPA);
+					//std::cout << "timeidentifyer: " << timeIdentifier(parameters, cpa.time_untill_CPA) << std::endl;
 					net.setEvidence("time_untill_closest_point_of_approach_towards_" + ship_name, timeIdentifier(parameters, cpa.time_untill_CPA));
 
-					//single_ship_meas_msg.distance_at_CPA_m = cpa.distance_at_CPA;
+					///single_ship_meas_msg.distance_at_CPA_m = cpa.distance_at_CPA;
 					//single_ship_meas_msg.distance_at_CPA_state_id = highresCPADistanceIdentifier(parameters, cpa.distance_at_CPA);
 					net.setEvidence("distance_at_cpa_towards_" + ship_name, highresCPADistanceIdentifier(parameters, cpa.distance_at_CPA));
 
@@ -292,39 +338,45 @@ namespace INTENTION_INFERENCE
 					//single_ship_meas_msg.crossing_distance_front_state_id = crossInFrontHighresIdentifier(parameters, crossing_in_front_distance);
 					net.setEvidence("crossing_distance_front_towards_" + ship_name, crossInFrontHighresIdentifier(parameters, crossing_in_front_distance));
 
-					auto distanceToMidpointResult = distanceToMidpointCourse(better_at(ship_states, my_id), ship_state);
+					/*auto distanceToMidpointResult = distanceToMidpointCourse(better_at(ship_states, my_id), ship_state);
 					//single_ship_meas_msg.two_times_distance_to_midpoint_at_cpa_to_m = distanceToMidpointResult.distance_to_midpoint;
 					//single_ship_meas_msg.two_times_distance_to_midpoint_at_cpa_to_state_id = twotimesDistanceToMidpointIdentifier(parameters, distanceToMidpointResult.distance_to_midpoint);
 					net.setEvidence("two_times_distance_to_midpoint_at_cpa_to_" + ship_name, twotimesDistanceToMidpointIdentifier(parameters, distanceToMidpointResult.distance_to_midpoint));
 
 					//single_ship_meas_msg.crossing_with_midpoint_on_side = crossingWithMidpointOnSideIdentifier(distanceToMidpointResult.crossing_with_midpoint_on_port_side);
-					net.setEvidence("crossing_with_midpoint_on_side_"+ship_name, crossingWithMidpointOnSideIdentifier(distanceToMidpointResult.crossing_with_midpoint_on_port_side));
+					net.setEvidence("crossing_with_midpoint_on_side_"+ship_name, crossingWithMidpointOnSideIdentifier(distanceToMidpointResult.crossing_with_midpoint_on_port_side));*/
 
 					//single_ship_meas_msg.aft_front_crossing_side = frontAftIdentifier(cpa.passing_in_front);
 					net.setEvidence("aft_front_crossing_side_to_" + ship_name, frontAftIdentifier(cpa.passing_in_front));
+					//std::cout << "in front: " << cpa.passing_in_front << std::endl;
+					//std::cout << "aft side: " << frontAftIdentifier(cpa.passing_in_front) << std::endl;
 
 					//single_ship_meas_msg.passed = hasPassedIdentifier(cpa.time_untill_CPA);
 					net.setEvidence("passed_" + ship_name, hasPassedIdentifier(cpa.time_untill_CPA));
+					//std::cout << "passed: " << hasPassedIdentifier(cpa.time_untill_CPA) << std::endl;
 
 					//single_ship_meas_msg.port_starboard_crossing_side = crossing_port_starboard_identifier(cpa.bearing_relative_to_heading);
 					net.setEvidence("crossing_wiht_other_on_port_side_to_" + ship_name, crossing_port_starboard_identifier(cpa.bearing_relative_to_heading));
+					//std::cout << "crossing other on port: " << crossing_port_starboard_identifier(cpa.bearing_relative_to_heading) << std::endl;
 
 					//measurement_msgs->ship_measurements.push_back(single_ship_meas_msg);
 				}
 			}
 
-			for (const auto ship_name : ship_names)
+	
+			for (const auto ship_name1 : ship_names)
 			{
-				if (!std::count(handled_ship_names.begin(), handled_ship_names.end(), ship_name))
+				if (!std::count(handled_ship_names.begin(), handled_ship_names.end(), ship_name1))
 				{
-					net.setEvidence("disable_" + ship_name, "disabled");
+					net.setEvidence("disable_" + ship_name1, "disabled");
 				}
 			}
 
 			net.setEvidence(output_name, "true");
-			//evaluate_nodes(node_state_msg);
+			evaluate_nodes();
 
 			return did_save;
+			
 		}
 
 		// double evaluateTrajectory(const Eigen::MatrixXd &trajectory, const std::map<int, Eigen::Vector4d> &ship_states, std::vector<int> currently_tracked_ships, double dt, custom_msgs::IntentionMeasurement *measurement_msgs)
