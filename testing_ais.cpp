@@ -64,9 +64,13 @@ int main(){
     std::vector<std::map<int, Eigen::Vector4d > > ship_state;
 
 	int num_ships = 2;
+
+    std::string filename = "new_case_LQLVS-60-sec.csv";
+
+    std::string filename_open = "files/"+filename;
     
 
-    std::ifstream ifile("new_case_LQLVS-60-sec.csv");
+    std::ifstream ifile(filename_open);
     std::vector<int> mmsi_vec;
     std::vector<double> time_vec;
 	std::vector<double> new_time_vec;
@@ -110,7 +114,7 @@ int main(){
             y_vec.push_back(y);
             sog_vec.push_back(sog);
             cog_vec.push_back(cog);
-            time_vec.push_back(time_1);
+            time_vec.push_back(time_1-1536718000);
             
 
         }
@@ -160,21 +164,36 @@ int main(){
         //std::cout << ship_list[ship] << std::endl;
     //}
 
+    std::ofstream myfile;
+    std::string filename_close = "intention_"+filename;
+      myfile.open (filename_close);
+      myfile << "mmsi,x,y,time,colreg_compliant,good_seamanship,unmodeled_behaviour,HO,CR_SS,CR_PS,OT_ing,OT_en,priority_lower,priority_similar,priority_higher\n";
+
     std::map<int, INTENTION_INFERENCE::IntentionModel> ship_intentions;
     ship_intentions.insert(std::pair<int, INTENTION_INFERENCE::IntentionModel>(ship_list[0], INTENTION_INFERENCE::IntentionModel("intention_model_two_ships.xdsl",param,ship_list[0],ship_state[1])));
     ship_intentions.insert(std::pair<int, INTENTION_INFERENCE::IntentionModel>(ship_list[1], INTENTION_INFERENCE::IntentionModel("intention_model_two_ships.xdsl",param,ship_list[1],ship_state[1])));
 
     
     
-   for(int i = 10; i < 35; i++){
+   for(int i = 1; i < new_time_vec.size() ; i++){
         std::cout << "timestep: " << i << std::endl;
+        int j= 0;
        for(auto& [ship_id, current_ship_intention_model] : ship_intentions){
         std::cout << "ship id:" << ship_id << std::endl;
-        current_ship_intention_model.insertObservation(ship_state[i],ship_list,false,new_time_vec[i]);
+        myfile << ship_id;
+        myfile << ",";
+        myfile << x_vec[new_time_vec.size()*j+i];
+        myfile << ",";
+        myfile << y_vec[new_time_vec.size()*j+i];
+        myfile << ",";
+        myfile << new_time_vec[i];
+        myfile << ",";
+        current_ship_intention_model.insertObservation(ship_state[i],ship_list,false,new_time_vec[i],myfile);
+        j++;
     }
    }
 
-    
+    myfile.close();
     
     
 }

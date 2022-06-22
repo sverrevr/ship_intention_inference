@@ -78,17 +78,23 @@ namespace INTENTION_INFERENCE
 			return false;
 		}
 
-		void evaluate_nodes(){
+		void evaluate_nodes(std::ofstream &myfile){
 			int reference_ship_id = my_id;
 
 			auto result = net.evaluateStates(all_node_names);
 
 			auto intention_colregs_compliant = better_at(better_at(result, "intention_colregs_compliant"), "true");
+			myfile << intention_colregs_compliant;
+			myfile << ",";
 			std::cout << "intention_colregs_compliant: " << intention_colregs_compliant << std::endl;
 			auto intention_ignoring_safety = better_at(better_at(result, "intention_ignoring_safety"), "true");
 			auto intention_good_seamanship = better_at(better_at(result, "intention_good_seamanship"), "true");
+			myfile << intention_good_seamanship;
+			myfile << ",";
 			std::cout << "intention_good_seamanship: " << intention_good_seamanship << std::endl;
 			auto intention_unmodeled_behaviour = better_at(better_at(result, "unmodelled_behaviour"), "true");
+			myfile << intention_unmodeled_behaviour;
+			myfile << ",";
 			std::cout << "intention_unmodeled_behaviour: " << intention_unmodeled_behaviour << std::endl;
 			auto has_turned_portwards = better_at(better_at(result, "has_turned_portwards"), "true");
 			auto has_turned_starboardwards = better_at(better_at(result, "has_turned_starboardwards"), "true");
@@ -96,23 +102,39 @@ namespace INTENTION_INFERENCE
 			//node_state_msg->stands_on_correct = better_at(better_at(result, "stands_on_correct"), "true");
 			auto stands_on_correct = better_at(better_at(result, "stands_on_correct"), "true");
 			auto observation_applicable = better_at(better_at(result, "observation_applicable"), "true");
-
+			
 			for (auto const &[ship_id, ship_name] : ship_name_map)
 			{
 				if (ship_id != my_id)
 				{
 					auto intention_colav_situation_HO = better_at(better_at(result, "colav_situation_towards_" + ship_name), "HO");
+					myfile << intention_colav_situation_HO;
+					myfile << ",";
 					auto intention_colav_situation_CR_SS = better_at(better_at(result, "colav_situation_towards_" + ship_name), "CR_SS");
+					myfile << intention_colav_situation_CR_SS;
+					myfile << ",";
 					std::cout << "intention_colav_situation_CR_SS: " << intention_colav_situation_CR_SS << std::endl;
 					auto intention_colav_situation_CR_PS = better_at(better_at(result, "colav_situation_towards_" + ship_name), "CR_PS");
+					myfile << intention_colav_situation_CR_PS;
+					myfile << ",";
 					std::cout << "intention_colav_situation_CR_PS: " << intention_colav_situation_CR_PS << std::endl;
 					auto intention_colav_situation_OT_ing = better_at(better_at(result, "colav_situation_towards_" + ship_name), "OT_ing");
+					myfile << intention_colav_situation_OT_ing;
+					myfile << ",";
 					auto intention_colav_situation_OT_en = better_at(better_at(result, "colav_situation_towards_" + ship_name), "OT_en");
+					myfile << intention_colav_situation_OT_en;
+					myfile << ",";
 
 					auto priority_intention_lower = better_at(better_at(result, "priority_intention_to_" + ship_name), "lower");
+					myfile << priority_intention_lower;
+					myfile << ",";
 					auto priority_intention_similar = better_at(better_at(result, "priority_intention_to_" + ship_name), "similar");
+					myfile << priority_intention_similar;
+					myfile << ",";
 					std::cout << "priority_intention_similar: " << priority_intention_similar << std::endl;
 					auto autopriority_intention_higher = better_at(better_at(result, "priority_intention_to_" + ship_name), "higher");
+					myfile << autopriority_intention_higher;
+					myfile << "\n";
 				}
 			}
 
@@ -232,6 +254,8 @@ namespace INTENTION_INFERENCE
 					all_node_names.push_back(node + ship_name);
 				}
 			}
+
+	
 			net.setEvidence(priors);
 
 			// Initiate colregs situation
@@ -276,7 +300,7 @@ namespace INTENTION_INFERENCE
 			//net.save_network("network_with_config_probabilities");
 		}
 
-		bool insertObservation(const std::map<int, Eigen::Vector4d> &ship_states, std::vector<int> currently_tracked_ships, bool is_changing_course, double time)
+		bool insertObservation(const std::map<int, Eigen::Vector4d> &ship_states, std::vector<int> currently_tracked_ships, bool is_changing_course, double time, std::ofstream &myfile)
 		{
 			//node_state_msg->header.stamp = ros::Time::now();
 			//measurement_msgs->header.stamp = ros::Time::now();
@@ -373,7 +397,7 @@ namespace INTENTION_INFERENCE
 			}
 
 			net.setEvidence(output_name, "true");
-			evaluate_nodes();
+			evaluate_nodes(myfile);
 
 			return did_save;
 			
