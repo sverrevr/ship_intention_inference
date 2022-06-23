@@ -14,16 +14,19 @@ namespace INTENTION_INFERENCE
 	static constexpr float DEG2RAD = M_PI / 180.0f;
 	static constexpr float RAD2DEG = 180.0f / M_PI;
 
+	// mean = 0, standard deviation/sigma = 1
 	inline auto standardNormalCDF(double value)
 	{
 		return 0.5 * erfc(-value * M_SQRT1_2);
 	}
 
+	// version of standard normal distribution where the mean and standard deviation is fixed 
 	inline auto normalCDF(double value, double mu, double sigma)
 	{
 		return standardNormalCDF((value - mu) / sigma);
 	}
 
+	//evaluating probability
 	inline auto evaluateBinProbability(double bin_start, double bin_end, double mu, double sigma)
 	{
 		return normalCDF(bin_end, mu, sigma) - normalCDF(bin_start, mu, sigma);

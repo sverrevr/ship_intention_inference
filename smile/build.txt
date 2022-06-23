@@ -3,7 +3,7 @@ product edition: ACADEMIC
 library version: 1.6.0
 release date: 2020-09-28
 commit: 590b5504b036
-compiler version: gcc (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0
+compiler version: Apple LLVM version 9.1.0 (clang-902.0.39.2)
 compiler flags: -DNDEBUG -O3 -ffast-math -fPIC
-built on: Wed, 26 Jan 2022 13:27:56 +0000
-operating system: Linux x86_64
+built on: Mon, 28 Sep 2020 09:28:26 +0000
+operating system: Darwin x86_64

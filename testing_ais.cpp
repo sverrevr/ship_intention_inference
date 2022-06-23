@@ -112,7 +112,7 @@ int main(){
 	int num_ships = 2;
     
 
-    std::ifstream ifile("files/new_case_LQLVS-60-sec.csv");
+    std::ifstream ifile("new_case_LQLVS-60-sec.csv");
     std::vector<int> mmsi_vec;
     std::vector<time_t> time_vec;
 	std::vector<time_t> new_time_vec;
@@ -188,12 +188,12 @@ int main(){
         std::cout << "cog: " << cog_vec[i] << std::endl;
     }  */
 
-    for(int i = 0; i < ship_state.size(); i++){
+    /*for(int i = 0; i < ship_state.size(); i++){
             for(auto it = ship_state[i].cbegin(); it != ship_state[i].cend(); ++it){
             std::cout << it->first << " -> " << it->second << std::endl;
             std::cout << " time: " << new_time_vec[i] << std::endl;
         }
-    }
+    }*/
 
 
     
@@ -207,14 +207,22 @@ int main(){
     //}
 
     std::map<int, INTENTION_INFERENCE::IntentionModel> ship_intentions;
-    //ship_intentions.insert(std::pair<int, INTENTION_INFERENCE::IntentionModel>(ship_list[0], INTENTION_INFERENCE::IntentionModel("intention_model_two_ships.xdsl",param,ship_list[0],ship_state[0])));
+    ship_intentions.insert(std::pair<int, INTENTION_INFERENCE::IntentionModel>(ship_list[0], INTENTION_INFERENCE::IntentionModel("intention_model_two_ships.xdsl",param,ship_list[0],ship_state[1])));
+	ship_intentions.insert(std::pair<int, INTENTION_INFERENCE::IntentionModel>(ship_list[1], INTENTION_INFERENCE::IntentionModel("intention_model_two_ships.xdsl",param,ship_list[1],ship_state[1])));
 
-   //for(int i = 0; i < ship_state.size(); i++){
-       // for(auto& [ship_id, current_ship_intention_model] : ship_intentions){
-         //   current_ship_intention_model.insertObservation(ship_state[i],ship_list,false,new_time_vec[i]);
-        //}
-   // }
-   
-    
-    
+	/*for(int i = 0; i < ship_state.size(); i++){
+    	for(auto& [ship_name, current_ship_intention_model] : ship_intentions){
+        	current_ship_intention_model.insertObservation(ship_state[i],ship_list,false,new_time_vec[i]);
+
+        }
+    }
+	*/
+	/*
+	for(auto ship: ship_intentions){
+            for(auto& [ship_id, current_ship_intention_model] : ship_intentions){
+            //std::cout << ship_id << std::endl;
+			//std::cout << current_ship_intention_model << std::endl;
+        }
+    }
+	*/
 }
