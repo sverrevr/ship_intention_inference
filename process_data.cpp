@@ -7,10 +7,6 @@
 #include <cmath>
 #include <algorithm>
 
-//using namespace std;
-
-//find mu/mean, sigma/standard deviation, max, n_bins 
-
 double find_mean(std::vector<double> vect){
     double sum = accumulate(vect.begin(), vect.end(), 0.0);
     double mean = sum/vect.size();
@@ -59,6 +55,7 @@ std::vector<std::vector<std::string> > read_file(std::string filename){
     std::vector<std::string> row;
     std::string line, num;
     std::fstream file (filename, std::ios::in);
+    std::cout << "Reading file" << filename;
     if(file.is_open()){
             while(getline(file, line)){
                 row.clear();
@@ -96,29 +93,56 @@ double find_max(std::vector<double> v){
     return max;
 }
 
+std::vector<double> find_distribution(std::vector<double> v){
+    double min = find_min(v);
+    double max = find_max(v);
+    int num_intervals = 30; //want 30 intervals
+    double size_of_interval = (max - min) / num_intervals;  
+    double start_interval = min;
+    int sum = 0;
+    std::vector<int> instance_count_vec(num_intervals,0);
+    
+    for(int j=0; j < num_intervals ; j++){
+        for(int i=0; i < v.size(); i++){
+            double end_interval = start_interval+size_of_interval;
+            if ((v[i] > start_interval) && (v[i] < end_interval)){
+                instance_count_vec[j] += 1;
+                }
+            }
+        start_interval += size_of_interval;
+    }
+
+    double tot_sum = 0;
+    tot_sum = std::accumulate(instance_count_vec.begin(), instance_count_vec.end(),0);
+    
+    std::vector<double> dist(num_intervals, 0);
+    for(int i=0; i<num_intervals;i++){
+        dist[i] = (instance_count_vec[i]/tot_sum)*100;
+    }
+    
+    for(int i=0; i < num_intervals; i++){
+        std::cout << dist[i]<<" ";
+    }
+    return dist;
+}
+
 int main(){
     
-    //std::vector<std::vector<std::string> > cont;
-    //std::vector<std::string> row;
+    const std::string filename = "classified_west.csv";
+    std::vector<std::vector<std::string> > content = read_file(filename);
+
+    int const colreg_idx = 7;
+    int const r_man_idx = 4;
+    int const cpa_idx = 6;
+
     std::vector<double> cpa_vector_OTGW;
     std::vector<double> cpa_vector_CRGW;
     std::vector<double> cpa_vector_HO;
     std::vector<double> r_man_vector_OTGW; 
     std::vector<double> r_man_vector_CRGW;
     std::vector<double> r_man_vector_HO;
-        
-    //std::string line, num;
-    const std::string filename = "classified_west.csv";
-    std::vector<std::vector<std::string> > content = read_file(filename);
 
-    int colreg_idx = 7;
-    int r_man_idx = 4;
-    int cpa_idx = 6;
-    // Find relevant column and extract info, make function
     for(int i=1;i<content.size();i++){   //start at 1 to not include name 
-    //for(int i=1;i<100;i++){  //keep for testing, switch to upper one with time
-        //cout<<" own_mmsi: "<<content[i][0]<<" "<< "obst_mmsi: "<< content[i][1]<<" "<< "r_cpa: "<< content[i][7]<<" "<< "r_manouvre: "<< content[i][6]<<" "<< "colreg_type: "<< content[i][8];
-        //std::cout<<"\n";
         std::string colreg_situation = content[i][colreg_idx];
         double col = stod(colreg_situation);
 
@@ -150,48 +174,26 @@ int main(){
             r_man_vector_HO.push_back(r_man_HO);
         }
     }
-
-    double min = find_min(cpa_vector_OTGW);
-    double max = find_max(cpa_vector_OTGW);
-    int num_intervals = 30; //want 30 intervals
-    double size_of_interval = (max - min) / num_intervals;  
-    //std::cout << size_of_interval <<" ";
-    double start_interval = min;
-    //std::cout <<start_interval;
-    double curr_start;
-    //map<int, double> Distribution;   // <interval, num_elements> 
-    std::vector<std::vector<double> > intervals;
-    std::vector<double> one_interval;
-    int sum = 0;
-    int array[30] = {0};
+    std::cout << "\n\n";
+    std::cout << "Probability CPA OTGW (Overtake, Give Way)" << "\n";
+    std::vector<double> PD_CPA_OTGW = find_distribution(cpa_vector_OTGW);
+    std::cout << "\n\n";
+    std::cout << "Probability CPA CRGW (Crossing, Give Way)" << "\n";
+    std::vector<double> PD_CPA_CRGW  = find_distribution(cpa_vector_CRGW);
+    std::cout << "\n\n";
+    std::cout << "Probability CPA HO (Head On)" << "\n";
+    std::vector<double> PD_CPA_HO  = find_distribution(cpa_vector_HO);
+    std::cout << "\n\n";
+    std::cout << "Probability R MANEUVER OTGW (Overtake, Give Way)" << "\n";
+    std::vector<double> PD_R_MANEUVER_OTGW  = find_distribution(r_man_vector_OTGW);
+    std::cout << "\n\n";
+    std::cout << "Probability R MANEUVER CRGW (Crossing, Give Way)" << "\n";
+    std::vector<double> PD_R_MANEUVER_CRGW  = find_distribution(r_man_vector_CRGW);
+    std::cout << "\n\n";
+    std::cout << "Probability R MANEUVER HO (Head On)" << "\n";
+    std::vector<double> PD_R_MANEUVER_HO  = find_distribution(r_man_vector_HO);
     
-    for(int j=0; j < 30 ; j++){
-        for(int i=0; i < cpa_vector_OTGW.size(); i++){
-        //std::cout << cpa_vector_OTGW[i] << " ";
-        double end_interval = start_interval+size_of_interval;
-        if ((cpa_vector_OTGW[i] > start_interval) && (cpa_vector_OTGW[i] < end_interval)){
-            //std::cout << "found: " << cpa_vector_OTGW[i];
-            array[j] += 1;
-            }
-        }
-        start_interval += size_of_interval;
-    }
     
-    int size = sizeof(array)/sizeof(array[0]);
-    for(int i=0; i < size; i++){
-        //std::cout << sizeof(array);
-        std::cout << array[i]<< " ";
-    }
-    /*
-    std::cout << "\n" << "OTGW, Overtake, Give Away: "<<"\n\n";
-    print_cpa_and_r(cpa_vector_OTGW,r_man_vector_OTGW);
-
-    std::cout << "\n"<< "CRGW / Crossing, Give Away: "<<"\n\n";
-    print_cpa_and_r(cpa_vector_CRGW, r_man_vector_CRGW);
-
-    std::cout << "\n" << "HO / Head On: "<<"\n\n";
-    print_cpa_and_r(cpa_vector_HO, r_man_vector_HO);
-    */
     return 0;
 }
 
