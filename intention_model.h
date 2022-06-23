@@ -78,23 +78,20 @@ namespace INTENTION_INFERENCE
 			return false;
 		}
 
-		void evaluate_nodes(std::ofstream &myfile){
+		void evaluate_nodes(std::ofstream &intentionFile){
 			int reference_ship_id = my_id;
 
 			auto result = net.evaluateStates(all_node_names);
 
 			auto intention_colregs_compliant = better_at(better_at(result, "intention_colregs_compliant"), "true");
-			myfile << intention_colregs_compliant;
-			myfile << ",";
+			intentionFile << intention_colregs_compliant << ",";
 			std::cout << "intention_colregs_compliant: " << intention_colregs_compliant << std::endl;
 			auto intention_ignoring_safety = better_at(better_at(result, "intention_ignoring_safety"), "true");
 			auto intention_good_seamanship = better_at(better_at(result, "intention_good_seamanship"), "true");
-			myfile << intention_good_seamanship;
-			myfile << ",";
+			intentionFile << intention_good_seamanship << ",";
 			std::cout << "intention_good_seamanship: " << intention_good_seamanship << std::endl;
 			auto intention_unmodeled_behaviour = better_at(better_at(result, "unmodelled_behaviour"), "true");
-			myfile << intention_unmodeled_behaviour;
-			myfile << ",";
+			intentionFile << intention_unmodeled_behaviour << ",";
 			std::cout << "intention_unmodeled_behaviour: " << intention_unmodeled_behaviour << std::endl;
 			auto has_turned_portwards = better_at(better_at(result, "has_turned_portwards"), "true");
 			auto has_turned_starboardwards = better_at(better_at(result, "has_turned_starboardwards"), "true");
@@ -108,108 +105,30 @@ namespace INTENTION_INFERENCE
 				if (ship_id != my_id)
 				{
 					auto intention_colav_situation_HO = better_at(better_at(result, "colav_situation_towards_" + ship_name), "HO");
-					myfile << intention_colav_situation_HO;
-					myfile << ",";
+					intentionFile << intention_colav_situation_HO << ",";
 					auto intention_colav_situation_CR_SS = better_at(better_at(result, "colav_situation_towards_" + ship_name), "CR_SS");
-					myfile << intention_colav_situation_CR_SS;
-					myfile << ",";
+					intentionFile << intention_colav_situation_CR_SS << ",";
 					std::cout << "intention_colav_situation_CR_SS: " << intention_colav_situation_CR_SS << std::endl;
 					auto intention_colav_situation_CR_PS = better_at(better_at(result, "colav_situation_towards_" + ship_name), "CR_PS");
-					myfile << intention_colav_situation_CR_PS;
-					myfile << ",";
+					intentionFile << intention_colav_situation_CR_PS << ",";
 					std::cout << "intention_colav_situation_CR_PS: " << intention_colav_situation_CR_PS << std::endl;
 					auto intention_colav_situation_OT_ing = better_at(better_at(result, "colav_situation_towards_" + ship_name), "OT_ing");
-					myfile << intention_colav_situation_OT_ing;
-					myfile << ",";
+					intentionFile << intention_colav_situation_OT_ing << ",";
 					auto intention_colav_situation_OT_en = better_at(better_at(result, "colav_situation_towards_" + ship_name), "OT_en");
-					myfile << intention_colav_situation_OT_en;
-					myfile << ",";
+					intentionFile << intention_colav_situation_OT_en << ",";
 
 					auto priority_intention_lower = better_at(better_at(result, "priority_intention_to_" + ship_name), "lower");
-					myfile << priority_intention_lower;
-					myfile << ",";
+					intentionFile << priority_intention_lower << ",";
 					auto priority_intention_similar = better_at(better_at(result, "priority_intention_to_" + ship_name), "similar");
-					myfile << priority_intention_similar;
-					myfile << ",";
+					intentionFile << priority_intention_similar << ",";
 					std::cout << "priority_intention_similar: " << priority_intention_similar << std::endl;
 					auto autopriority_intention_higher = better_at(better_at(result, "priority_intention_to_" + ship_name), "higher");
-					myfile << autopriority_intention_higher;
-					myfile << "\n";
+					intentionFile << autopriority_intention_higher << "\n";
 				}
 			}
 
 		}
 
-		/*void evaluate_nodes() //custom_msgs::IntentionNodeState *node_state_msg
-		{
-			//header.stamp = ros::Time::now();
-			int reference_ship_id = my_id;
-
-			auto result = net.evaluateStates(all_node_names);
-
-			auto intention_colregs_compliant = better_at(better_at(result, "intention_colregs_compliant"), "true");
-			std::cout << "intention_colregs_compliant: " << intention_colregs_compliant << std::endl;
-			auto intention_ignoring_safety = better_at(better_at(result, "intention_ignoring_safety"), "true");
-			auto intention_good_seamanship = better_at(better_at(result, "intention_good_seamanship"), "true");
-			std::cout << "intention_good_seamanship: " << intention_good_seamanship << std::endl;
-			auto intention_unmodeled_behaviour = better_at(better_at(result, "unmodelled_behaviour"), "true");
-			std::cout << "intention_unmodeled_behaviour: " << intention_unmodeled_behaviour << std::endl;
-			auto has_turned_portwards = better_at(better_at(result, "has_turned_portwards"), "true");
-			auto has_turned_starboardwards = better_at(better_at(result, "has_turned_starboardwards"), "true");
-			std::cout << "has_turned_starboardwards: " << has_turned_starboardwards << std::endl;
-			//node_state_msg->stands_on_correct = better_at(better_at(result, "stands_on_correct"), "true");
-			auto stands_on_correct = better_at(better_at(result, "stands_on_correct"), "true");
-			auto observation_applicable = better_at(better_at(result, "observation_applicable"), "true");
-
-			// Convert from map to vector
-			std::transform(better_at(result, "intention_ample_time").begin(), better_at(result, "intention_ample_time").end(), std::back_inserter(node_state_msg->intention_ample_time), [](std::pair<std::string, double> v)
-						   { return (float)v.second; });
-			std::transform(better_at(result, "intention_safe_distance_front").begin(), better_at(result, "intention_safe_distance_front").end(), std::back_inserter(node_state_msg->intention_safe_distance_front), [](std::pair<std::string, double> v)
-						   { return (float)v.second; });
-			std::transform(better_at(result, "intention_safe_distance").begin(), better_at(result, "intention_safe_distance").end(), std::back_inserter(node_state_msg->intention_safe_distance), [](std::pair<std::string, double> v)
-						   { return (float)v.second; });
-			std::transform(better_at(result, "intention_safe_distance_midpoint").begin(), better_at(result, "intention_safe_distance_midpoint").end(), std::back_inserter(node_state_msg->intention_safe_distance_midpoint), [](std::pair<std::string, double> v)
-						   { return (float)v.second; });
-
-			node_state_msg->ship_intermediate_nodes.clear();
-			for (auto const &[ship_id, ship_name] : ship_name_map)
-			{
-				if (ship_id != my_id)
-				{
-					custom_msgs::IntentionNodeStateSingleShip node_state_single_ship_msg;
-					node_state_single_ship_msg.towards_ship_id = ship_id;
-					node_state_single_ship_msg.enabled = better_at(better_at(result, "disable_" + ship_name), "enabled");
-					node_state_single_ship_msg.is_pre_ample_time = better_at(better_at(result, "is_pre_ample_time_to_" + ship_name), "true");
-					//node_state_single_ship_msg.safely_passed = better_at(better_at(result, "safely_passed_" + ship_name), "true");
-					node_state_single_ship_msg.safe_distance_at_CPA = better_at(better_at(result, "safe_distance_at_CPA_towards_" + ship_name), "true");
-					node_state_single_ship_msg.safe_crossing_front = better_at(better_at(result, "safe_crossing_front_towards_" + ship_name), "true");
-					node_state_single_ship_msg.safe_distance = better_at(better_at(result, "safe_distance_to_" + ship_name), "true");
-					node_state_single_ship_msg.safe_distance_to_midpoint = better_at(better_at(result, "safe_distance_to_midpoint_" + ship_name), "true");
-					node_state_single_ship_msg.good_seamanship = better_at(better_at(result, "good_seamanship_to_" + ship_name), "true");
-					//node_state_single_ship_msg.GW_OT_ing_correct = better_at(better_at(result, "GW_OT_ing_correct_" + ship_name), "true");
-					//node_state_single_ship_msg.GW_OT_en_correct = better_at(better_at(result, "GW_OT_en_correct_" + ship_name), "true");
-					//node_state_single_ship_msg.GW_CR_SS_corerct = better_at(better_at(result, "GW_CR_SS_corerct_" + ship_name), "true");
-					//node_state_single_ship_msg.GW_CR_PS_correct = better_at(better_at(result, "GW_CR_PS_correct_" + ship_name), "true");
-					//node_state_single_ship_msg.GW_HO_correct = better_at(better_at(result, "GW_HO_correct_" + ship_name), "true");
-					node_state_single_ship_msg.gives_way_correct = better_at(better_at(result, "gives_way_correct_towards_" + ship_name), "true");
-					//node_state_single_ship_msg.GWC_or_pre_ample_time = better_at(better_at(result, "GWC_or_pre_ample_time_towards_" + ship_name), "true");
-					node_state_single_ship_msg.Observation_applicable = better_at(better_at(result, "Observation_applicable_towards_" + ship_name), "true");
-					node_state_single_ship_msg.role_is_gw = better_at(better_at(result, "role_towards_" + ship_name), "GW");
-
-					node_state_single_ship_msg.intention_colav_situation_HO = better_at(better_at(result, "colav_situation_towards_" + ship_name), "HO");
-					node_state_single_ship_msg.intention_colav_situation_CR_SS = better_at(better_at(result, "colav_situation_towards_" + ship_name), "CR_SS");
-					node_state_single_ship_msg.intention_colav_situation_CR_PS = better_at(better_at(result, "colav_situation_towards_" + ship_name), "CR_PS");
-					node_state_single_ship_msg.intention_colav_situation_OT_ing = better_at(better_at(result, "colav_situation_towards_" + ship_name), "OT_ing");
-					node_state_single_ship_msg.intention_colav_situation_OT_en = better_at(better_at(result, "colav_situation_towards_" + ship_name), "OT_en");
-
-					node_state_single_ship_msg.priority_intention_lower = better_at(better_at(result, "priority_intention_to_" + ship_name), "lower");
-					node_state_single_ship_msg.priority_intention_similar = better_at(better_at(result, "priority_intention_to_" + ship_name), "similar");
-					node_state_single_ship_msg.priority_intention_higher = better_at(better_at(result, "priority_intention_to_" + ship_name), "higher");
-
-					node_state_msg->ship_intermediate_nodes.push_back(node_state_single_ship_msg);
-				}
-			}
-		}*/
 
 	public:
 		IntentionModel(std::string network_file_name, const IntentionModelParameters &parameters, int my_id, const std::map<int, Eigen::Vector4d> &ship_states) : IntentionModel(network_file_name, parameters, my_id, ship_states, std::map<std::string, std::string>{}) {}
