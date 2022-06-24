@@ -94,19 +94,21 @@ double find_max(std::vector<double> v){
 }
 
 /*
-int find_idx(std::string name, std::vector<std::vector<std::string> > content){
-    //find index for different parameters in first line of file 
-    int idx = 0;
-    for(int i=0; i < content.size(); i++){
-        std::string colreg_situation = content[0][i];
-        std::cout << colreg_situation;
-        if(content[0][i] != name){
-            std::cout<<"found";
-            idx = i;
+std::vector<double> find_distribution_OTGW(std::vector<std::vector<std::string> > c, double colreg_sit, int idx_parameter,){
+    std::vector<double> distribution;
+    for(int i=1;i<c.size();i++){   //start at 1 to not include name 
+        std::string colreg_situation = c[i][colreg_idx];
+        double col = stod(colreg_situation);
+
+        if(col == -2){
+            std::string val_OTGW = c[i][idx_parameter];
+            double d_OTGW = stod(val_OTGW);
+            distribution.push_back(d_OTGW);
         }
     }
-    return idx;
+    return distribution;
 }*/
+
 
 std::vector<double> find_distribution(std::vector<double> v){
     double min = find_min(v);
@@ -144,72 +146,78 @@ std::vector<double> find_distribution(std::vector<double> v){
 int main(){
     
     const std::string filename = "classified_west.csv";
+    const std::string filename2 = "data_west.csv";
+
     std::vector<std::vector<std::string> > content = read_file(filename);
 
-    //int col = find_idx("COLREG", content );
-    //std::cout << " col: "<< col;
-
+    bool print = true;
+    
     int colreg_idx = 7;
-    int r_man_idx = 4;
+    int cpa_ts_idx = 4;
     int cpa_idx = 6;
+    
+    int timestep = 60;
 
     std::vector<double> cpa_vector_OTGW;
     std::vector<double> cpa_vector_CRGW;
     std::vector<double> cpa_vector_HO;
-    std::vector<double> r_man_vector_OTGW; 
-    std::vector<double> r_man_vector_CRGW;
-    std::vector<double> r_man_vector_HO;
+    std::vector<double> cpa_ts_vector_OTGW; 
+    std::vector<double> cpa_ts_vector_CRGW;
+    std::vector<double> cpa_ts_vector_HO;
 
     for(int i=1;i<content.size();i++){   //start at 1 to not include name 
         std::string colreg_situation = content[i][colreg_idx];
-        double col = stod(colreg_situation);
+        int col = stoi(colreg_situation);
 
         if(col == -2){
             std::string cpa_val_OTGW = content[i][cpa_idx];
             double d_cpa_OTGW = stod(cpa_val_OTGW);
             cpa_vector_OTGW.push_back(d_cpa_OTGW);
 
-            std::string r_maneuver_own_OTGW = content[i][r_man_idx];
-            double r_man_OTGW = stod(r_maneuver_own_OTGW);
-            r_man_vector_OTGW.push_back(r_man_OTGW);
+            std::string cpa_ts_own_OTGW = content[i][cpa_ts_idx];
+            double cpa_ts_OTGW = stod(cpa_ts_own_OTGW)*timestep;
+            cpa_ts_vector_OTGW.push_back(cpa_ts_OTGW);
         }
         else if(col == -1){
             std::string cpa_val_CRGW = content[i][cpa_idx];
             double d_cpa_CRGW = stod(cpa_val_CRGW);
             cpa_vector_CRGW.push_back(d_cpa_CRGW);
 
-            std::string r_maneuver_own_CRGW = content[i][r_man_idx];
-            double r_man_CRGW = stod(r_maneuver_own_CRGW);
-            r_man_vector_CRGW.push_back(r_man_CRGW);
+            std::string cpa_ts_own_CRGW = content[i][cpa_ts_idx];
+            double cpa_ts_CRGW = stod(cpa_ts_own_CRGW)*timestep;
+            cpa_ts_vector_CRGW.push_back(cpa_ts_CRGW);
         }
         else{
             std::string cpa_val_HO = content[i][6];
             double d_cpa_HO = stod(cpa_val_HO);
             cpa_vector_HO.push_back(d_cpa_HO);
 
-            std::string r_maneuver_own_HO = content[i][4];
-            double r_man_HO = stod(r_maneuver_own_HO);
-            r_man_vector_HO.push_back(r_man_HO);
+            std::string cpa_ts_own_HO = content[i][4];
+            double cpa_ts_HO = stod(cpa_ts_own_HO)*timestep;
+            cpa_ts_vector_HO.push_back(cpa_ts_HO);
         }
     }
-    std::cout << "\n\n";
-    std::cout << "Probability CPA OTGW (Overtake, Give Way)" << "\n";
-    std::vector<double> PD_CPA_OTGW = find_distribution(cpa_vector_OTGW);
-    std::cout << "\n\n";
-    std::cout << "Probability CPA CRGW (Crossing, Give Way)" << "\n";
-    std::vector<double> PD_CPA_CRGW  = find_distribution(cpa_vector_CRGW);
-    std::cout << "\n\n";
-    std::cout << "Probability CPA HO (Head On)" << "\n";
-    std::vector<double> PD_CPA_HO  = find_distribution(cpa_vector_HO);
-    std::cout << "\n\n";
-    std::cout << "Probability R MANEUVER OTGW (Overtake, Give Way)" << "\n";
-    std::vector<double> PD_R_MANEUVER_OTGW  = find_distribution(r_man_vector_OTGW);
-    std::cout << "\n\n";
-    std::cout << "Probability R MANEUVER CRGW (Crossing, Give Way)" << "\n";
-    std::vector<double> PD_R_MANEUVER_CRGW  = find_distribution(r_man_vector_CRGW);
-    std::cout << "\n\n";
-    std::cout << "Probability R MANEUVER HO (Head On)" << "\n";
-    std::vector<double> PD_R_MANEUVER_HO  = find_distribution(r_man_vector_HO);
+
+    if(print){
+        std::cout << "\n\n";
+        std::cout << "Probability CPA OTGW (Overtake, Give Way)" << "\n";
+        std::vector<double> PD_CPA_OTGW = find_distribution(cpa_vector_OTGW);
+        std::cout << "\n\n";
+        std::cout << "Probability CPA CRGW (Crossing, Give Way)" << "\n";
+        std::vector<double> PD_CPA_CRGW  = find_distribution(cpa_vector_CRGW);
+        std::cout << "\n\n";
+        std::cout << "Probability CPA HO (Head On)" << "\n";
+        std::vector<double> PD_CPA_HO  = find_distribution(cpa_vector_HO);
+        std::cout << "\n\n";
+        std::cout << "Probability R MANEUVER OTGW (Overtake, Give Way)" << "\n";
+        std::vector<double> PD_cpa_ts_OTGW  = find_distribution(cpa_ts_vector_OTGW);
+        std::cout << "\n\n";
+        std::cout << "Probability R MANEUVER CRGW (Crossing, Give Way)" << "\n";
+        std::vector<double> PD_cpa_ts_CRGW  = find_distribution(cpa_ts_vector_CRGW);
+        std::cout << "\n\n";
+        std::cout << "Probability R MANEUVER HO (Head On)" << "\n";
+        std::vector<double> PD_cpa_ts_HO  = find_distribution(cpa_ts_vector_HO);
+    }
     
     
     return 0;
