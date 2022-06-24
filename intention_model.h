@@ -106,6 +106,7 @@ namespace INTENTION_INFERENCE
 				{
 					auto intention_colav_situation_HO = better_at(better_at(result, "colav_situation_towards_" + ship_name), "HO");
 					intentionFile << intention_colav_situation_HO << ",";
+					std::cout << "intention_colav_situation_HO: " << intention_colav_situation_HO << std::endl;
 					auto intention_colav_situation_CR_SS = better_at(better_at(result, "colav_situation_towards_" + ship_name), "CR_SS");
 					intentionFile << intention_colav_situation_CR_SS << ",";
 					std::cout << "intention_colav_situation_CR_SS: " << intention_colav_situation_CR_SS << std::endl;
@@ -114,8 +115,10 @@ namespace INTENTION_INFERENCE
 					std::cout << "intention_colav_situation_CR_PS: " << intention_colav_situation_CR_PS << std::endl;
 					auto intention_colav_situation_OT_ing = better_at(better_at(result, "colav_situation_towards_" + ship_name), "OT_ing");
 					intentionFile << intention_colav_situation_OT_ing << ",";
+					std::cout << "intention_colav_situation_OT_ing: " << intention_colav_situation_OT_ing << std::endl;
 					auto intention_colav_situation_OT_en = better_at(better_at(result, "colav_situation_towards_" + ship_name), "OT_en");
 					intentionFile << intention_colav_situation_OT_en << ",";
+					std::cout << "intention_colav_situation_OT_en: " << intention_colav_situation_OT_en << std::endl;
 
 					auto priority_intention_lower = better_at(better_at(result, "priority_intention_to_" + ship_name), "lower");
 					intentionFile << priority_intention_lower << ",";
@@ -123,9 +126,10 @@ namespace INTENTION_INFERENCE
 					intentionFile << priority_intention_similar << ",";
 					std::cout << "priority_intention_similar: " << priority_intention_similar << std::endl;
 					auto autopriority_intention_higher = better_at(better_at(result, "priority_intention_to_" + ship_name), "higher");
-					intentionFile << autopriority_intention_higher << "\n";
+					intentionFile << autopriority_intention_higher;
 				}
 			}
+			intentionFile << "\n";
 
 		}
 
@@ -234,7 +238,7 @@ namespace INTENTION_INFERENCE
 				net.incrementTime();
 				did_save = true;
 			}
-
+			
 			//node_state_msg->number_of_timesteps = net.getNumberOfTimeSteps();
 
 			//measurement_msgs->change_in_course_deg = RAD2DEG * (better_at(ship_states, my_id)[CHI] - better_at(initial_ship_states, my_id)[CHI]);
@@ -246,8 +250,9 @@ namespace INTENTION_INFERENCE
 			net.setEvidence("change_in_speed", changeInSpeedIdentifier(parameters, better_at(ship_states, my_id)[U], better_at(initial_ship_states, my_id)[U]));
 
 			//measurement_msgs->is_changing_course = is_changing_course;
-			net.setEvidence("is_changing_course", is_changing_course);
 
+			net.setEvidence("is_changing_course", is_changing_course);  
+			
 			//measurement_msgs->ship_measurements.clear();
 
 			std::vector<std::string> handled_ship_names;
@@ -266,7 +271,7 @@ namespace INTENTION_INFERENCE
 
 					net.setEvidence("disable_" + ship_name, "enabled");
 
-					//std::cout <<cpa.time_untill_CPA << std::endl;
+					std::cout <<cpa.time_untill_CPA << std::endl;
 					//single_ship_meas_msg.time_untill_CPA_state_id = timeIdentifier(parameters, cpa.time_untill_CPA);
 					//std::cout << "timeidentifyer: " << timeIdentifier(parameters, cpa.time_untill_CPA) << std::endl;
 					net.setEvidence("time_untill_closest_point_of_approach_towards_" + ship_name, timeIdentifier(parameters, cpa.time_untill_CPA));
@@ -281,22 +286,23 @@ namespace INTENTION_INFERENCE
 					//single_ship_meas_msg.crossing_distance_front_state_id = crossInFrontHighresIdentifier(parameters, crossing_in_front_distance);
 					net.setEvidence("crossing_distance_front_towards_" + ship_name, crossInFrontHighresIdentifier(parameters, crossing_in_front_distance));
 
-					/*auto distanceToMidpointResult = distanceToMidpointCourse(better_at(ship_states, my_id), ship_state);
+					auto distanceToMidpointResult = distanceToMidpointCourse(better_at(ship_states, my_id), ship_state);
 					//single_ship_meas_msg.two_times_distance_to_midpoint_at_cpa_to_m = distanceToMidpointResult.distance_to_midpoint;
 					//single_ship_meas_msg.two_times_distance_to_midpoint_at_cpa_to_state_id = twotimesDistanceToMidpointIdentifier(parameters, distanceToMidpointResult.distance_to_midpoint);
 					net.setEvidence("two_times_distance_to_midpoint_at_cpa_to_" + ship_name, twotimesDistanceToMidpointIdentifier(parameters, distanceToMidpointResult.distance_to_midpoint));
 
 					//single_ship_meas_msg.crossing_with_midpoint_on_side = crossingWithMidpointOnSideIdentifier(distanceToMidpointResult.crossing_with_midpoint_on_port_side);
-					net.setEvidence("crossing_with_midpoint_on_side_"+ship_name, crossingWithMidpointOnSideIdentifier(distanceToMidpointResult.crossing_with_midpoint_on_port_side));*/
+					net.setEvidence("crossing_with_midpoint_on_side_"+ship_name, crossingWithMidpointOnSideIdentifier(distanceToMidpointResult.crossing_with_midpoint_on_port_side));
+					std::cout << "midpoint side: " << distanceToMidpointResult.crossing_with_midpoint_on_port_side << std::endl;
 
 					//single_ship_meas_msg.aft_front_crossing_side = frontAftIdentifier(cpa.passing_in_front);
 					net.setEvidence("aft_front_crossing_side_to_" + ship_name, frontAftIdentifier(cpa.passing_in_front));
 					//std::cout << "in front: " << cpa.passing_in_front << std::endl;
-					//std::cout << "aft side: " << frontAftIdentifier(cpa.passing_in_front) << std::endl;
+					std::cout << "aft side: " << frontAftIdentifier(cpa.passing_in_front) << std::endl;
 
 					//single_ship_meas_msg.passed = hasPassedIdentifier(cpa.time_untill_CPA);
 					net.setEvidence("passed_" + ship_name, hasPassedIdentifier(cpa.time_untill_CPA));
-					//std::cout << "passed: " << hasPassedIdentifier(cpa.time_untill_CPA) << std::endl;
+					std::cout << "passed: " << hasPassedIdentifier(cpa.time_untill_CPA) << std::endl;
 
 					//single_ship_meas_msg.port_starboard_crossing_side = crossing_port_starboard_identifier(cpa.bearing_relative_to_heading);
 					net.setEvidence("crossing_wiht_other_on_port_side_to_" + ship_name, crossing_port_starboard_identifier(cpa.bearing_relative_to_heading));
