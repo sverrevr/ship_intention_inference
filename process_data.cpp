@@ -93,6 +93,21 @@ double find_max(std::vector<double> v){
     return max;
 }
 
+/*
+int find_idx(std::string name, std::vector<std::vector<std::string> > content){
+    //find index for different parameters in first line of file 
+    int idx = 0;
+    for(int i=0; i < content.size(); i++){
+        std::string colreg_situation = content[0][i];
+        std::cout << colreg_situation;
+        if(content[0][i] != name){
+            std::cout<<"found";
+            idx = i;
+        }
+    }
+    return idx;
+}*/
+
 std::vector<double> find_distribution(std::vector<double> v){
     double min = find_min(v);
     double max = find_max(v);
@@ -131,9 +146,12 @@ int main(){
     const std::string filename = "classified_west.csv";
     std::vector<std::vector<std::string> > content = read_file(filename);
 
-    int const colreg_idx = 7;
-    int const r_man_idx = 4;
-    int const cpa_idx = 6;
+    //int col = find_idx("COLREG", content );
+    //std::cout << " col: "<< col;
+
+    int colreg_idx = 7;
+    int r_man_idx = 4;
+    int cpa_idx = 6;
 
     std::vector<double> cpa_vector_OTGW;
     std::vector<double> cpa_vector_CRGW;
