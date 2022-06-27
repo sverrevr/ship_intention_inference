@@ -49,8 +49,9 @@ class BayesianNetwork{
         for(int i=0; i<CPT.GetSize(); ++i){
             sum += CPT[i];
         }
-        if(sum<0.9999 || sum>1.00001 || !isfinite(sum)) printf("ERROR: Prior distribution on \"%s\" sums to %f, should be 1", node_name.c_str(), sum);
-        assert(sum>=0.9999 && sum<=1.00001);
+        //if(sum<0.9999 || sum>1.00001 || !isfinite(sum)) printf("ERROR: Prior distribution on \"%s\" sums to %f, should be 1", node_name.c_str(), sum);
+        if(sum<0.8 || sum>1.1 || !isfinite(sum)) printf("ERROR: Prior distribution on \"%s\" sums to %f, should be 1", node_name.c_str(), sum);
+        assert(sum>=0.8 && sum<=1.1);
         const auto node_id = getNodeId(node_name);
         auto result =  net.GetNode(node_id)->Definition()->SetDefinition(CPT);
         if(result<0) printf("ERROR: Setting priors failed on node \"%s\"", node_name.c_str());
@@ -189,28 +190,33 @@ public:
         setDefinition(node_name, CPT);
     }
 
-    // to modify matrix for distribution
-    // might add some logic for n_bins
-    // input map with distributions 
-    // 
-    
-    void setAisDistribution(const std::string node_name, std::map<int, std::vector<double> > distr_map){
+    void setAisDistribution(const std::string node_name, std::string filename, int colreg_idx, int cpa_dist_idx, int multiply, int n_bins){
+        std::vector<std::vector<std::string> > content = read_file(filename);
+        std::map<int, std::vector<double> > ais_cpa_map = aisMap(content, colreg_idx, cpa_dist_idx, multiply);
+        std::map<int, std::vector<double> > distr_cpa_map = distributionMap(ais_cpa_map, n_bins);
         const auto node_id = getNodeId(node_name);
         auto node_definition = net.GetNode(node_id)->Definition();
         DSL_doubleArray CPT(node_definition->GetMatrix()->GetSize());  //henter ut matrix i baysian network
         // CPT = distr_map[-2];
-        std::cout << "Distribution added: \n";
-        for(std::map<int, std::vector<double> >::iterator it=distr_map.begin(); it != distr_map.end(); ++it){
+        std::cout << "\n Distribution added: \n";
+        double sum = 0;
+        for(std::map<int, std::vector<double> >::iterator it=distr_cpa_map.begin(); it != distr_cpa_map.end(); ++it){
             int col = (*it).first;
             std::vector<double> inVect = (*it).second;
             if(col == -2){
                 for(int i=0; i < CPT.GetSize()-1; ++i){
                     CPT[i]= inVect[i];
-                    std::cout << CPT[i];
+                    std::cout << CPT[i] << " ";
+                    sum += CPT[i];
                 }
             }
         }
+        if(sum<0.9999 || sum>1.0001 || !isfinite(sum)){
+            double error = 1.0000-sum;
+            CPT[CPT.GetSize()-1] +=  error;
+        }
         setDefinition(node_name, CPT);
+        std::cout << "\n";
     }
 
     void setVirtualEvidence(std::string node_name,const std::vector<double>& virtualEvidence, int time_slice=-1){

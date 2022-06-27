@@ -94,10 +94,6 @@ double find_max(std::vector<double> v){
     return max;
 }
 
-// return map with vectors 
-    // [-2] [<234, 453, 567, ..., ...>]
-    // [-1] [<345, ..., ...,         >]
-    // [3]  [<231, ..., ..., ..., ...>]
 std::map<int, std::vector<double> > aisMap(std::vector<std::vector<std::string> > content, int colreg_idx, int cpa_idx, int timestep){
     std::map<int, std::vector<double> > ais_cases;
    
@@ -179,6 +175,7 @@ void printDist(std::map<int, std::vector<double> > my_map){
         std::cout << std::endl;
     }
 }
+
 
 int main(){
     
