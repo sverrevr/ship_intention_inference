@@ -635,7 +635,7 @@
 			<parents>intention_good_seamanship has_turned_portwards has_turned_starboardwards crossing_wiht_other_on_port_side_to_ship0</parents>
 			<probabilities>0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 1 0 1 0 0 1 1 0 1 0</probabilities>
 		</cpt>
-		<cpt id="is_chaging_course" dynamic="plate">
+		<cpt id="is_changing_course" dynamic="plate">
 			<state id="false" />
 			<state id="true" />
 			<probabilities>0.5 0.5</probabilities>
@@ -643,7 +643,7 @@
 		<cpt id="GWC_or_pre_ample_time_towards_ship0" dynamic="plate">
 			<state id="false" />
 			<state id="true" />
-			<parents>gives_way_correct_towards_ship0 is_chaging_course is_pre_ample_time_to_ship0 stands_on_correct_or_forced_to_give_way_ship0</parents>
+			<parents>gives_way_correct_towards_ship0 is_changing_course is_pre_ample_time_to_ship0 stands_on_correct_or_forced_to_give_way_ship0</parents>
 			<probabilities>1 0 1 0 1 0 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1</probabilities>
 		</cpt>
 		<cpt id="Observation_applicable_towards_ship0" dynamic="plate">
@@ -717,7 +717,7 @@
 		<cpt id="GWC_or_pre_ample_time_towards_ship1" dynamic="plate">
 			<state id="false" />
 			<state id="true" />
-			<parents>gives_way_correct_towards_ship1 is_chaging_course is_pre_ample_time_to_ship1 stands_on_correct_or_forced_to_give_way_ship1</parents>
+			<parents>gives_way_correct_towards_ship1 is_changing_course is_pre_ample_time_to_ship1 stands_on_correct_or_forced_to_give_way_ship1</parents>
 			<probabilities>1 0 1 0 1 0 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1</probabilities>
 		</cpt>
 		<cpt id="Observation_applicable_towards_ship1" dynamic="plate">
@@ -1391,7 +1391,7 @@
 				<comment>Original equation:\naft_front_crossing_side_to_ship0=Bernoulli(0.5)\nBounds: (0, 1)</comment>
 				<barchart active="true" width="128" height="92" />
 			</node>
-			<node id="is_chaging_course">
+			<node id="is_changing_course">
 				<name>is chaging course</name>
 				<interior color="339966" />
 				<outline color="003300" />
