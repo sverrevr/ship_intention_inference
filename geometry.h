@@ -3,6 +3,15 @@
 #pragma once
 #include <cmath>
 #include "Eigen/Dense"
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <sstream>
+#include <numeric> // std::inner_product
+#include <cmath>
+#include <algorithm>
+#include <map>
 
 namespace INTENTION_INFERENCE
 {
@@ -14,16 +23,19 @@ namespace INTENTION_INFERENCE
 	static constexpr float DEG2RAD = M_PI / 180.0f;
 	static constexpr float RAD2DEG = 180.0f / M_PI;
 
+	// mean = 0, standard deviation/sigma = 1
 	inline auto standardNormalCDF(double value)
 	{
 		return 0.5 * erfc(-value * M_SQRT1_2);
 	}
 
+	// version of standard normal distribution where the mean and standard deviation is fixed 
 	inline auto normalCDF(double value, double mu, double sigma)
 	{
 		return standardNormalCDF((value - mu) / sigma);
 	}
 
+	//evaluating probability
 	inline auto evaluateBinProbability(double bin_start, double bin_end, double mu, double sigma)
 	{
 		return normalCDF(bin_end, mu, sigma) - normalCDF(bin_start, mu, sigma);
@@ -516,4 +528,122 @@ namespace INTENTION_INFERENCE
 		auto bearing_to_obstacle_at_CPA = relativeBearing(CPA.closest_point_ownship, CPA.closest_point_obstacle_ship(PX), CPA.closest_point_obstacle_ship(PY));
 		return bearing_to_obstacle_at_CPA < 0;
 	}
+	
+	inline std::vector<std::vector<std::string> > read_file(std::string filename){
+		std::vector<std::vector<std::string> > content;
+		std::vector<std::string> row;
+		std::string line, num;
+		std::fstream file (filename, std::ios::in);
+		std::cout << "\nReading file" << filename;
+		if(file.is_open()){
+				while(getline(file, line)){
+					row.clear();
+
+					std::stringstream str(line);
+
+					while(std::getline(str, num, ';'))
+
+					row.push_back(num);
+					content.push_back(row);
+				}
+			}
+			else
+				std::cout << "Could not open file";
+		return content;
+	}
+
+	inline double find_min(std::vector<double> v){
+		double min = v[0];
+		for(int i=1; i < v.size(); i++){
+			if(v[i] < min){
+				min = v[i];
+			}
+		}
+		return min;
+	}
+
+	inline double find_max(std::vector<double> v){
+		double max = v[0];
+		for(int i=1; i < v.size(); i++){
+			if(v[i] > max){
+				max = v[i];
+			}
+		}
+		return max;
+	}
+
+	inline std::map<int, std::vector<double> > aisMap(std::vector<std::vector<std::string> > content, int colreg_idx, int cpa_idx, int timestep){
+		std::map<int, std::vector<double> > ais_cases;
+	
+		for(int i=1;i<content.size();i++){   //start at 1 to not include name 
+			std::string colreg_situation = content[i][colreg_idx];
+			int col = stoi(colreg_situation);
+
+			if(col == -2){
+				std::string cpa_val_OTGW = content[i][cpa_idx];
+				double cpa_OTGW = stod(cpa_val_OTGW)*timestep;
+				ais_cases[-2].push_back(cpa_OTGW);
+			}
+			else if(col == -1){
+				std::string cpa_val_CRGW = content[i][cpa_idx];
+				double cpa_CRGW = stod(cpa_val_CRGW)*timestep;
+				ais_cases[-1].push_back(cpa_CRGW);
+			}
+			else{
+				std::string cpa_val_HO = content[i][cpa_idx];
+				double cpa_HO = stod(cpa_val_HO)*timestep;
+				ais_cases[3].push_back(cpa_HO);
+			}
+		}
+		return ais_cases;
+	} 
+
+	inline std::vector<double> find_distribution(std::vector<double> v, int n_bins){
+		double min = find_min(v);
+		double max = find_max(v);
+		int num_intervals = n_bins; //want 30 intervals
+		double size_of_interval = (max - min) / num_intervals;  
+		double start_interval = min;
+		int sum = 0;
+		std::vector<int> instance_count_vec(num_intervals,0);
+		
+		for(int j=0; j < num_intervals ; j++){
+			for(int i=0; i < v.size(); i++){
+				double end_interval = start_interval+size_of_interval;
+				if ((v[i] > start_interval) && (v[i] < end_interval)){
+					instance_count_vec[j] += 1;
+					}
+				}
+			start_interval += size_of_interval;
+		}
+
+		double tot_sum = 0;
+		tot_sum = std::accumulate(instance_count_vec.begin(), instance_count_vec.end(),0);
+		
+		std::vector<double> dist(num_intervals, 0);
+		double dist_sum = 0;
+		for(int i=0; i<num_intervals;i++){
+			dist[i] = (instance_count_vec[i]/tot_sum);
+			dist_sum += dist[i];
+		}
+		double error = (100 - dist_sum);
+		if(error != 0){
+			dist[-1] += error;
+		}
+
+		return dist;
+	}
+
+	inline std::map<int, std::vector<double> > distributionMap(std::map<int, std::vector<double> > ais_map, int n_bins){
+		std::map<int, std::vector<double> > distributionMap;
+		for(std::map<int, std::vector<double> >::iterator it=ais_map.begin(); it != ais_map.end(); ++it){
+				int col = (*it).first;
+				std::vector<double> inVect = (*it).second;
+				std::vector<double> dist = find_distribution(inVect, n_bins);
+				distributionMap[col] = dist;
+			}
+		return distributionMap;
+	}
+
+
 } // namespace INTENTION_INFERENCE

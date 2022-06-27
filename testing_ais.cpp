@@ -17,6 +17,10 @@
 void readFileToVecs (std::string filename, std::vector<int> &mmsi_vec, std::vector<double> &time_vec, std::vector<double> &x_vec, std::vector<double> &y_vec, std::vector<double> &sog_vec, std::vector<double> &cog_vec){
     std::string filename_open = "files/"+filename;
     std::ifstream ifile(filename_open);
+    std::vector<int> mmsi_vec;
+    std::vector<time_t> time_vec;
+	std::vector<time_t> new_time_vec;
+    std::vector<double> x_vec, y_vec, sog_vec, cog_vec;
 
     int mmsi;
     time_t time;
@@ -223,10 +227,44 @@ int main(){
         std::cout << "cog: " << cog_vec[i] << std::endl;
     } 
 
-    for (int i = 0; i < 5; i++){
+
+    /*for(int i = 0; i < ship_state.size(); i++){
+
             for(auto it = ship_state[i].cbegin(); it != ship_state[i].cend(); ++it){
             std::cout << it->first << " -> " << it->second << std::endl;
             std::cout << " time: " << unique_time_vec[i] << std::endl;
         }
+
     } */
+
+    
+
+    std::set<int> s( mmsi_vec.begin(), mmsi_vec.end() );
+    std::vector<int> ship_list;
+    ship_list.assign( s.begin(), s.end() );
+
+    //for (int ship = 0; ship < ship_list.size(); ++ship){
+        //std::cout << ship_list[ship] << std::endl;
+    //}
+
+    std::map<int, INTENTION_INFERENCE::IntentionModel> ship_intentions;
+    ship_intentions.insert(std::pair<int, INTENTION_INFERENCE::IntentionModel>(ship_list[0], INTENTION_INFERENCE::IntentionModel("intention_model_two_ships.xdsl",param,ship_list[0],ship_state[1])));
+	ship_intentions.insert(std::pair<int, INTENTION_INFERENCE::IntentionModel>(ship_list[1], INTENTION_INFERENCE::IntentionModel("intention_model_two_ships.xdsl",param,ship_list[1],ship_state[1])));
+
+	/*for(int i = 0; i < ship_state.size(); i++){
+    	for(auto& [ship_name, current_ship_intention_model] : ship_intentions){
+        	current_ship_intention_model.insertObservation(ship_state[i],ship_list,false,new_time_vec[i]);
+
+        }
+    }
+	*/
+	/*
+	for(auto ship: ship_intentions){
+            for(auto& [ship_id, current_ship_intention_model] : ship_intentions){
+            //std::cout << ship_id << std::endl;
+			//std::cout << current_ship_intention_model << std::endl;
+        }
+    }
+	*/
+
 }

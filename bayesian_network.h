@@ -12,6 +12,8 @@
 #include <iostream>
 #include "geometry.h"
 #include <stdio.h>
+#include <iostream>
+
 
 namespace INTENTION_INFERENCE
 {
@@ -47,8 +49,9 @@ class BayesianNetwork{
         for(int i=0; i<CPT.GetSize(); ++i){
             sum += CPT[i];
         }
-        if(sum<0.9999 || sum>1.00001 || !isfinite(sum)) printf("ERROR: Prior distribution on \"%s\" sums to %f, should be 1", node_name.c_str(), sum);
-        assert(sum>=0.9999 && sum<=1.00001);
+        //if(sum<0.9999 || sum>1.00001 || !isfinite(sum)) printf("ERROR: Prior distribution on \"%s\" sums to %f, should be 1", node_name.c_str(), sum);
+        if(sum<0.8 || sum>1.1 || !isfinite(sum)) printf("ERROR: Prior distribution on \"%s\" sums to %f, should be 1", node_name.c_str(), sum);
+        assert(sum>=0.8 && sum<=1.1);
         const auto node_id = getNodeId(node_name);
         auto result =  net.GetNode(node_id)->Definition()->SetDefinition(CPT);
         if(result<0) printf("ERROR: Setting priors failed on node \"%s\"", node_name.c_str());
@@ -174,6 +177,7 @@ public:
         setPriors(node_name, {{"false", 1-probablity_of_true},{"true", probablity_of_true}});
     }
 
+    // for e<ach elemeent 
     void setPriorNormalDistribution(const std::string node_name, const double mu, const double sigma, const double bin_width){
         const auto node_id = getNodeId(node_name);
         auto node_definition = net.GetNode(node_id)->Definition();
@@ -184,6 +188,35 @@ public:
         }
         CPT[CPT.GetSize()-1] = evaluateBinProbability((CPT.GetSize()-1)*bin_width, INFINITY, mu, sigma); //Last bin takes everything above max
         setDefinition(node_name, CPT);
+    }
+
+    void setAisDistribution(const std::string node_name, std::string filename, int colreg_idx, int cpa_dist_idx, int multiply, int n_bins){
+        std::vector<std::vector<std::string> > content = read_file(filename);
+        std::map<int, std::vector<double> > ais_cpa_map = aisMap(content, colreg_idx, cpa_dist_idx, multiply);
+        std::map<int, std::vector<double> > distr_cpa_map = distributionMap(ais_cpa_map, n_bins);
+        const auto node_id = getNodeId(node_name);
+        auto node_definition = net.GetNode(node_id)->Definition();
+        DSL_doubleArray CPT(node_definition->GetMatrix()->GetSize());  //henter ut matrix i baysian network
+        // CPT = distr_map[-2];
+        std::cout << "\n Distribution added: \n";
+        double sum = 0;
+        for(std::map<int, std::vector<double> >::iterator it=distr_cpa_map.begin(); it != distr_cpa_map.end(); ++it){
+            int col = (*it).first;
+            std::vector<double> inVect = (*it).second;
+            if(col == -2){
+                for(int i=0; i < CPT.GetSize()-1; ++i){
+                    CPT[i]= inVect[i];
+                    std::cout << CPT[i] << " ";
+                    sum += CPT[i];
+                }
+            }
+        }
+        if(sum<0.9999 || sum>1.0001 || !isfinite(sum)){
+            double error = 1.0000-sum;
+            CPT[CPT.GetSize()-1] +=  error;
+        }
+        setDefinition(node_name, CPT);
+        std::cout << "\n";
     }
 
     void setVirtualEvidence(std::string node_name,const std::vector<double>& virtualEvidence, int time_slice=-1){

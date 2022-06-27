@@ -169,7 +169,7 @@ namespace INTENTION_INFERENCE
 				if (ship_id != my_id)
 				{
 					ship_name_map[ship_id] = ship_names[i];
-					printf("Added ship name \"%s\" for ship id %d", ship_names[i].c_str(), ship_id);
+					printf("\nAdded ship name \"%s\" for ship id %d", ship_names[i].c_str(), ship_id);
 					++i;
 				}
 			}
@@ -227,12 +227,20 @@ namespace INTENTION_INFERENCE
 				}
 			}
 
-			net.setPriorNormalDistribution("intention_ample_time", parameters.ample_time_s.mu, parameters.ample_time_s.sigma, parameters.ample_time_s.max / parameters.ample_time_s.n_bins);
-			net.setPriorNormalDistribution("intention_safe_distance", parameters.safe_distance_m.mu, parameters.safe_distance_m.sigma, parameters.safe_distance_m.max / parameters.safe_distance_m.n_bins);
-			net.setPriorNormalDistribution("intention_safe_distance_midpoint", parameters.safe_distance_midpoint_m.mu, parameters.safe_distance_midpoint_m.sigma, parameters.safe_distance_midpoint_m.max / parameters.safe_distance_midpoint_m.n_bins);
-			net.setPriorNormalDistribution("intention_safe_distance_front", parameters.safe_distance_front_m.mu, parameters.safe_distance_front_m.sigma, parameters.safe_distance_front_m.max / parameters.safe_distance_front_m.n_bins);
+			//net.setPriorNormalDistribution("intention_ample_time", parameters.ample_time_s.mu, parameters.ample_time_s.sigma, parameters.ample_time_s.max / parameters.ample_time_s.n_bins);
+			//net.setPriorNormalDistribution("intention_safe_distance", parameters.safe_distance_m.mu, parameters.safe_distance_m.sigma, parameters.safe_distance_m.max / parameters.safe_distance_m.n_bins);
+			//net.setPriorNormalDistribution("intention_safe_distance_midpoint", parameters.safe_distance_midpoint_m.mu, parameters.safe_distance_midpoint_m.sigma, parameters.safe_distance_midpoint_m.max / parameters.safe_distance_midpoint_m.n_bins);
+			//net.setPriorNormalDistribution("intention_safe_distance_front", parameters.safe_distance_front_m.mu, parameters.safe_distance_front_m.sigma, parameters.safe_distance_front_m.max / parameters.safe_distance_front_m.n_bins);
+			int colreg_idx = 7;
+			int cpa_ts_idx = 4;  // per nå lik r_maneuver_own (skal byttes til cpa_ts_idx)
+			int cpa_dist_idx = 6;
+			
+			int timestep = 60;
+			int n_bins = 30;
+			int multiply =1;
+			net.setAisDistribution("intention_safe_distance", "classified_west.csv", colreg_idx, cpa_dist_idx, multiply, n_bins);
 
-			//net.save_network("network_with_config_probabilities");
+
 		}
 
 		bool insertObservation(const IntentionModelParameters &parameters, const std::map<int, Eigen::Vector4d> &ship_states, std::vector<int> currently_tracked_ships, bool is_changing_course, double time, std::ofstream &intentionFile)
