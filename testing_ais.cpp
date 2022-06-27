@@ -179,9 +179,9 @@ INTENTION_INFERENCE::IntentionModelParameters setModelParameters(){
 int main(){
     
 	int num_ships = 2;
-    //std::string filename = "new_Case_LQLVS-60-sec.csv";
+    //std::string filename = "new_Case_LQLVS-60-sec.csv"; //crossing
     //std::string filename = "new_Case - 04-12-2019, 20-10-56 - DOTVP-two-ships-60-sec-kopi.csv";
-    //std::string filename = "new_case_2ZC9Z-60-sec-two-ships.csv";
+    //std::string filename = "new_case_2ZC9Z-60-sec-two-ships.csv"; //head on
     //std::string filename = "new_Case - 01-08-2021, 08-21-29 - AQ5VM-60-sec-two-ships.csv"; //overtaking
     std::string filename = "new_Case - 01-15-2020, 09-05-49 - VATEN-60-sec-two-ships.csv"; //overtaking
     std::string intentionModelFilename = "intention_model_two_ships.xdsl";
