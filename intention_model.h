@@ -228,7 +228,8 @@ namespace INTENTION_INFERENCE
 			net.setPriorNormalDistribution("intention_safe_distance", parameters.safe_distance_m.mu, parameters.safe_distance_m.sigma, parameters.safe_distance_m.max / parameters.safe_distance_m.n_bins);
 			net.setPriorNormalDistribution("intention_safe_distance_midpoint", parameters.safe_distance_midpoint_m.mu, parameters.safe_distance_midpoint_m.sigma, parameters.safe_distance_midpoint_m.max / parameters.safe_distance_midpoint_m.n_bins);
 			net.setPriorNormalDistribution("intention_safe_distance_front", parameters.safe_distance_front_m.mu, parameters.safe_distance_front_m.sigma, parameters.safe_distance_front_m.max / parameters.safe_distance_front_m.n_bins);
-
+			//std::map<int, std::vector<double> > distr_map = 
+			//net.setAisDistribution(const std::string node_name, std::map<int, std::vector<double> > distr_map);
 			//net.save_network("network_with_config_probabilities");
 		}
 

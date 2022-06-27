@@ -6,6 +6,7 @@
 #include <numeric> // std::inner_product
 #include <cmath>
 #include <algorithm>
+#include <map>
 
 double find_mean(std::vector<double> vect){
     double sum = accumulate(vect.begin(), vect.end(), 0.0);
@@ -93,27 +94,40 @@ double find_max(std::vector<double> v){
     return max;
 }
 
-/*
-std::vector<double> find_distribution_OTGW(std::vector<std::vector<std::string> > c, double colreg_sit, int idx_parameter,){
-    std::vector<double> distribution;
-    for(int i=1;i<c.size();i++){   //start at 1 to not include name 
-        std::string colreg_situation = c[i][colreg_idx];
-        double col = stod(colreg_situation);
+// return map with vectors 
+    // [-2] [<234, 453, 567, ..., ...>]
+    // [-1] [<345, ..., ...,         >]
+    // [3]  [<231, ..., ..., ..., ...>]
+std::map<int, std::vector<double> > aisMap(std::vector<std::vector<std::string> > content, int colreg_idx, int cpa_idx, int timestep){
+    std::map<int, std::vector<double> > ais_cases;
+   
+    for(int i=1;i<content.size();i++){   //start at 1 to not include name 
+        std::string colreg_situation = content[i][colreg_idx];
+        int col = stoi(colreg_situation);
 
         if(col == -2){
-            std::string val_OTGW = c[i][idx_parameter];
-            double d_OTGW = stod(val_OTGW);
-            distribution.push_back(d_OTGW);
+            std::string cpa_val_OTGW = content[i][cpa_idx];
+            double cpa_OTGW = stod(cpa_val_OTGW)*timestep;
+            ais_cases[-2].push_back(cpa_OTGW);
+        }
+        else if(col == -1){
+            std::string cpa_val_CRGW = content[i][cpa_idx];
+            double cpa_CRGW = stod(cpa_val_CRGW)*timestep;
+            ais_cases[-1].push_back(cpa_CRGW);
+        }
+        else{
+            std::string cpa_val_HO = content[i][cpa_idx];
+            double cpa_HO = stod(cpa_val_HO)*timestep;
+            ais_cases[3].push_back(cpa_HO);
         }
     }
-    return distribution;
-}*/
+    return ais_cases;
+} 
 
-
-std::vector<double> find_distribution(std::vector<double> v){
+std::vector<double> find_distribution(std::vector<double> v, int n_bins){
     double min = find_min(v);
     double max = find_max(v);
-    int num_intervals = 30; //want 30 intervals
+    int num_intervals = n_bins; //want 30 intervals
     double size_of_interval = (max - min) / num_intervals;  
     double start_interval = min;
     int sum = 0;
@@ -143,6 +157,29 @@ std::vector<double> find_distribution(std::vector<double> v){
     return dist;
 }
 
+std::map<int, std::vector<double> > distributionMap(std::map<int, std::vector<double> > ais_map, int n_bins){
+    std::map<int, std::vector<double> > distributionMap;
+    for(std::map<int, std::vector<double> >::iterator it=ais_map.begin(); it != ais_map.end(); ++it){
+            int col = (*it).first;
+            std::vector<double> inVect = (*it).second;
+            std::vector<double> dist = find_distribution(inVect, n_bins);
+            distributionMap[col] = dist;
+        }
+    return distributionMap;
+}
+
+void printDist(std::map<int, std::vector<double> > my_map){
+    std::cout << "Distribution data: \n";
+    for(std::map<int, std::vector<double> >::iterator it=my_map.begin(); it != my_map.end(); ++it){
+        std::cout << (*it).first << " : ";
+        std::vector<double> inVect = (*it).second;
+        for(unsigned j=0; j<inVect.size();j++){
+            std::cout << inVect[j] << " ";
+        }
+        std::cout << std::endl;
+    }
+}
+
 int main(){
     
     const std::string filename = "classified_west.csv";
@@ -150,75 +187,21 @@ int main(){
 
     std::vector<std::vector<std::string> > content = read_file(filename);
 
-    bool print = true;
-    
     int colreg_idx = 7;
-    int cpa_ts_idx = 4;
-    int cpa_idx = 6;
+    int cpa_ts_idx = 4;  // per nå lik r_maneuver_own (skal byttes til cpa_ts_idx)
+    int cpa_dist_idx = 6;
     
     int timestep = 60;
+    int n_bins = 30;
 
-    std::vector<double> cpa_vector_OTGW;
-    std::vector<double> cpa_vector_CRGW;
-    std::vector<double> cpa_vector_HO;
-    std::vector<double> cpa_ts_vector_OTGW; 
-    std::vector<double> cpa_ts_vector_CRGW;
-    std::vector<double> cpa_ts_vector_HO;
+    // CPA distance, time step lik 1 
+    std::map<int, std::vector<double> > ais_cpa_map = aisMap(content, colreg_idx, cpa_dist_idx, 1);
+    std::map<int, std::vector<double> > distr_cpa_map = distributionMap(ais_cpa_map, n_bins);
 
-    for(int i=1;i<content.size();i++){   //start at 1 to not include name 
-        std::string colreg_situation = content[i][colreg_idx];
-        int col = stoi(colreg_situation);
+    printDist(distr_cpa_map);
 
-        if(col == -2){
-            std::string cpa_val_OTGW = content[i][cpa_idx];
-            double d_cpa_OTGW = stod(cpa_val_OTGW);
-            cpa_vector_OTGW.push_back(d_cpa_OTGW);
-
-            std::string cpa_ts_own_OTGW = content[i][cpa_ts_idx];
-            double cpa_ts_OTGW = stod(cpa_ts_own_OTGW)*timestep;
-            cpa_ts_vector_OTGW.push_back(cpa_ts_OTGW);
-        }
-        else if(col == -1){
-            std::string cpa_val_CRGW = content[i][cpa_idx];
-            double d_cpa_CRGW = stod(cpa_val_CRGW);
-            cpa_vector_CRGW.push_back(d_cpa_CRGW);
-
-            std::string cpa_ts_own_CRGW = content[i][cpa_ts_idx];
-            double cpa_ts_CRGW = stod(cpa_ts_own_CRGW)*timestep;
-            cpa_ts_vector_CRGW.push_back(cpa_ts_CRGW);
-        }
-        else{
-            std::string cpa_val_HO = content[i][6];
-            double d_cpa_HO = stod(cpa_val_HO);
-            cpa_vector_HO.push_back(d_cpa_HO);
-
-            std::string cpa_ts_own_HO = content[i][4];
-            double cpa_ts_HO = stod(cpa_ts_own_HO)*timestep;
-            cpa_ts_vector_HO.push_back(cpa_ts_HO);
-        }
-    }
-
-    if(print){
-        std::cout << "\n\n";
-        std::cout << "Probability CPA OTGW (Overtake, Give Way)" << "\n";
-        std::vector<double> PD_CPA_OTGW = find_distribution(cpa_vector_OTGW);
-        std::cout << "\n\n";
-        std::cout << "Probability CPA CRGW (Crossing, Give Way)" << "\n";
-        std::vector<double> PD_CPA_CRGW  = find_distribution(cpa_vector_CRGW);
-        std::cout << "\n\n";
-        std::cout << "Probability CPA HO (Head On)" << "\n";
-        std::vector<double> PD_CPA_HO  = find_distribution(cpa_vector_HO);
-        std::cout << "\n\n";
-        std::cout << "Probability R MANEUVER OTGW (Overtake, Give Way)" << "\n";
-        std::vector<double> PD_cpa_ts_OTGW  = find_distribution(cpa_ts_vector_OTGW);
-        std::cout << "\n\n";
-        std::cout << "Probability R MANEUVER CRGW (Crossing, Give Way)" << "\n";
-        std::vector<double> PD_cpa_ts_CRGW  = find_distribution(cpa_ts_vector_CRGW);
-        std::cout << "\n\n";
-        std::cout << "Probability R MANEUVER HO (Head On)" << "\n";
-        std::vector<double> PD_cpa_ts_HO  = find_distribution(cpa_ts_vector_HO);
-    }
-    
+    // CPA time, time step lik 60
+    // Fiks verdier    
     
     return 0;
 }

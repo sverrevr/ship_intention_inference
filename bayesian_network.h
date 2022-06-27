@@ -12,6 +12,8 @@
 #include <iostream>
 #include "geometry.h"
 #include <stdio.h>
+#include <iostream>
+
 
 namespace INTENTION_INFERENCE
 {
@@ -174,6 +176,7 @@ public:
         setPriors(node_name, {{"false", 1-probablity_of_true},{"true", probablity_of_true}});
     }
 
+    // for e<ach elemeent 
     void setPriorNormalDistribution(const std::string node_name, const double mu, const double sigma, const double bin_width){
         const auto node_id = getNodeId(node_name);
         auto node_definition = net.GetNode(node_id)->Definition();
@@ -183,6 +186,30 @@ public:
             CPT[i] = evaluateBinProbability(i*bin_width, (i+1)*bin_width, mu, sigma);
         }
         CPT[CPT.GetSize()-1] = evaluateBinProbability((CPT.GetSize()-1)*bin_width, INFINITY, mu, sigma); //Last bin takes everything above max
+        setDefinition(node_name, CPT);
+    }
+
+    // to modify matrix for distribution
+    // might add some logic for n_bins
+    // input map with distributions 
+    // 
+    
+    void setAisDistribution(const std::string node_name, std::map<int, std::vector<double> > distr_map){
+        const auto node_id = getNodeId(node_name);
+        auto node_definition = net.GetNode(node_id)->Definition();
+        DSL_doubleArray CPT(node_definition->GetMatrix()->GetSize());  //henter ut matrix i baysian network
+        // CPT = distr_map[-2];
+        std::cout << "Distribution added: \n";
+        for(std::map<int, std::vector<double> >::iterator it=distr_map.begin(); it != distr_map.end(); ++it){
+            int col = (*it).first;
+            std::vector<double> inVect = (*it).second;
+            if(col == -2){
+                for(int i=0; i < CPT.GetSize()-1; ++i){
+                    CPT[i]= inVect[i];
+                    std::cout << CPT[i];
+                }
+            }
+        }
         setDefinition(node_name, CPT);
     }
 
