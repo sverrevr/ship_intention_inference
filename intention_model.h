@@ -235,7 +235,8 @@ namespace INTENTION_INFERENCE
 			int timestep = 60;
 			int n_bins = 30;
 			int multiply =1;
-			net.setAisDistribution("intention_safe_distance", "classified_west.csv", colreg_idx, cpa_dist_idx, multiply, n_bins);
+			int col_sit = -2;   // fordi vi bruker overtaking situasjon 
+			net.setAisDistribution("intention_safe_distance", "classified_west.csv", colreg_idx, cpa_dist_idx, multiply, n_bins, col_sit);
 
 		}
 

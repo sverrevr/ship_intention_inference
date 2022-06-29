@@ -579,17 +579,17 @@ namespace INTENTION_INFERENCE
 			std::string colreg_situation = content[i][colreg_idx];
 			int col = stoi(colreg_situation);
 
-			if(col == -2){
+			if(col == -2){ // overtake
 				std::string cpa_val_OTGW = content[i][cpa_idx];
 				double cpa_OTGW = stod(cpa_val_OTGW)*timestep;
 				ais_cases[-2].push_back(cpa_OTGW);
 			}
-			else if(col == -1){
+			else if(col == -1){ // crossing
 				std::string cpa_val_CRGW = content[i][cpa_idx];
 				double cpa_CRGW = stod(cpa_val_CRGW)*timestep;
 				ais_cases[-1].push_back(cpa_CRGW);
 			}
-			else{
+			else{   //head on
 				std::string cpa_val_HO = content[i][cpa_idx];
 				double cpa_HO = stod(cpa_val_HO)*timestep;
 				ais_cases[3].push_back(cpa_HO);
