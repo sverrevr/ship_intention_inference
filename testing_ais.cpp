@@ -17,10 +17,6 @@
 void readFileToVecs (std::string filename, std::vector<int> &mmsi_vec, std::vector<double> &time_vec, std::vector<double> &x_vec, std::vector<double> &y_vec, std::vector<double> &sog_vec, std::vector<double> &cog_vec){
     std::string filename_open = "files/"+filename;
     std::ifstream ifile(filename_open);
-    std::vector<int> mmsi_vec;
-    std::vector<time_t> time_vec;
-	std::vector<time_t> new_time_vec;
-    std::vector<double> x_vec, y_vec, sog_vec, cog_vec;
 
     int mmsi;
     time_t time;
@@ -111,7 +107,7 @@ std::vector<int> getShipList(std::vector<int> mmsi_vec){
 
 void writeIntentionToFile(INTENTION_INFERENCE::IntentionModelParameters parameters, std::string filename, std::map<int, INTENTION_INFERENCE::IntentionModel> ship_intentions, std::vector<std::map<int, Eigen::Vector4d > > ship_state, std::vector<int> ship_list, std::vector<double> unique_time_vec, std::vector<double> x_vec, std::vector<double> y_vec){
     std::ofstream intentionFile;
-    std::string filename_intention = "intention_"+filename;
+    std::string filename_intention = "dist_intention_"+filename;
     intentionFile.open (filename_intention);
     intentionFile << "mmsi,x,y,time,CR_PS,CR_SS,HO,OT_en,OT_ing,colreg_compliant,good_seamanship,unmodeled_behaviour,priority_lower,priority_similar,priority_higher\n"; //,CR_SS2,CR_PS2,OT_ing2,OT_en2,priority_lower2,priority_similar2,priority_higher2\n";
     
@@ -133,18 +129,18 @@ void writeIntentionToFile(INTENTION_INFERENCE::IntentionModelParameters paramete
 }
 
 
-INTENTION_INFERENCE::IntentionModelParameters setModelParameters(){
+INTENTION_INFERENCE::IntentionModelParameters setModelParameters(int num_ships){
     INTENTION_INFERENCE::IntentionModelParameters param;
     param.number_of_network_evaluation_samples = 100000;
-	param.max_number_of_obstacles = 1; //must be set to num_ships-1 or else segmantation fault
+	param.max_number_of_obstacles = num_ships-1; //must be set to num_ships-1 or else segmantation fault
 	param.time_into_trajectory = 10;
 	param.expanding_dbn.min_time_s = 10;
 	param.expanding_dbn.max_time_s = 1200;
 	param.expanding_dbn.min_course_change_rad = 0.13;
 	param.expanding_dbn.min_speed_change_m_s = 0.5;
-	param.ample_time_s.mu = 60;
-	param.ample_time_s.sigma = 7;
-	param.ample_time_s.max = 100;
+	param.ample_time_s.mu = 200;
+	param.ample_time_s.sigma = 100;
+	param.ample_time_s.max = 1000;
 	param.ample_time_s.n_bins = 30; // this value must match the bayesian network
 	param.ample_time_s.minimal_accepted_by_ownship = 20;
 	param.safe_distance_m.mu = 15;
@@ -187,7 +183,10 @@ int main(){
     //std::string filename = "new_Case - 04-12-2019, 20-10-56 - DOTVP-two-ships-60-sec-kopi.csv";
     //std::string filename = "new_case_2ZC9Z-60-sec-two-ships.csv"; //head on
     //std::string filename = "new_Case - 01-08-2021, 08-21-29 - AQ5VM-60-sec-two-ships.csv"; //overtaking
-    std::string filename = "new_Case - 01-15-2020, 09-05-49 - VATEN-60-sec-two-ships.csv"; //overtaking
+    //std::string filename = "new_Case - 01-15-2020, 09-05-49 - VATEN-60-sec-two-ships.csv"; //overtaking
+    //std::string filename = "new_Case - 01-09-2018, 01-11-37 - RT3LY-60-sec-two-ships-filled.csv"; //head-on
+    std::string filename = "new_Case - 01-09-2018, 01-45-02 - 19JNJ-60-sec-two-ships.csv";
+
     std::string intentionModelFilename = "intention_model_two_ships.xdsl";
 
     std::vector<std::map<int, Eigen::Vector4d> > ship_state;
@@ -203,7 +202,7 @@ int main(){
 
 
 
-    INTENTION_INFERENCE::IntentionModelParameters parameters = setModelParameters();
+    INTENTION_INFERENCE::IntentionModelParameters parameters = setModelParameters(num_ships);
 
 
     std::map<int, INTENTION_INFERENCE::IntentionModel> ship_intentions;
@@ -217,7 +216,6 @@ int main(){
     
 
     /* OLD PRINTS
-
     for (int i= 0; i <2; i++){
         std::cout << "mmsi: " << mmsi_vec[i] << std::endl;
         std::cout << "time: " << time_vec[i] << std::endl;
@@ -226,45 +224,10 @@ int main(){
         std::cout << "sog: " << sog_vec[i] << std::endl;
         std::cout << "cog: " << cog_vec[i] << std::endl;
     } 
-
-
-    /*for(int i = 0; i < ship_state.size(); i++){
-
+    for (int i = 0; i < 5; i++){
             for(auto it = ship_state[i].cbegin(); it != ship_state[i].cend(); ++it){
             std::cout << it->first << " -> " << it->second << std::endl;
             std::cout << " time: " << unique_time_vec[i] << std::endl;
         }
-
     } */
-
-    
-
-    std::set<int> s( mmsi_vec.begin(), mmsi_vec.end() );
-    std::vector<int> ship_list;
-    ship_list.assign( s.begin(), s.end() );
-
-    //for (int ship = 0; ship < ship_list.size(); ++ship){
-        //std::cout << ship_list[ship] << std::endl;
-    //}
-
-    std::map<int, INTENTION_INFERENCE::IntentionModel> ship_intentions;
-    ship_intentions.insert(std::pair<int, INTENTION_INFERENCE::IntentionModel>(ship_list[0], INTENTION_INFERENCE::IntentionModel("intention_model_two_ships.xdsl",param,ship_list[0],ship_state[1])));
-	ship_intentions.insert(std::pair<int, INTENTION_INFERENCE::IntentionModel>(ship_list[1], INTENTION_INFERENCE::IntentionModel("intention_model_two_ships.xdsl",param,ship_list[1],ship_state[1])));
-
-	/*for(int i = 0; i < ship_state.size(); i++){
-    	for(auto& [ship_name, current_ship_intention_model] : ship_intentions){
-        	current_ship_intention_model.insertObservation(ship_state[i],ship_list,false,new_time_vec[i]);
-
-        }
-    }
-	*/
-	/*
-	for(auto ship: ship_intentions){
-            for(auto& [ship_id, current_ship_intention_model] : ship_intentions){
-            //std::cout << ship_id << std::endl;
-			//std::cout << current_ship_intention_model << std::endl;
-        }
-    }
-	*/
-
 }

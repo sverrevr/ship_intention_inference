@@ -227,7 +227,7 @@ namespace INTENTION_INFERENCE
 				}
 			}
 
-			//net.setPriorNormalDistribution("intention_ample_time", parameters.ample_time_s.mu, parameters.ample_time_s.sigma, parameters.ample_time_s.max / parameters.ample_time_s.n_bins);
+			net.setPriorNormalDistribution("intention_ample_time", parameters.ample_time_s.mu, parameters.ample_time_s.sigma, parameters.ample_time_s.max / parameters.ample_time_s.n_bins);
 			//net.setPriorNormalDistribution("intention_safe_distance", parameters.safe_distance_m.mu, parameters.safe_distance_m.sigma, parameters.safe_distance_m.max / parameters.safe_distance_m.n_bins);
 			//net.setPriorNormalDistribution("intention_safe_distance_midpoint", parameters.safe_distance_midpoint_m.mu, parameters.safe_distance_midpoint_m.sigma, parameters.safe_distance_midpoint_m.max / parameters.safe_distance_midpoint_m.n_bins);
 			//net.setPriorNormalDistribution("intention_safe_distance_front", parameters.safe_distance_front_m.mu, parameters.safe_distance_front_m.sigma, parameters.safe_distance_front_m.max / parameters.safe_distance_front_m.n_bins);
@@ -238,7 +238,12 @@ namespace INTENTION_INFERENCE
 			int timestep = 60;
 			int n_bins = 30;
 			int multiply =1;
-			net.setAisDistribution("intention_safe_distance", "classified_west.csv", colreg_idx, cpa_dist_idx, multiply, n_bins);
+			int head_on = 3;
+			int overtake = -2;
+			int crossing = -1;
+			net.setAisDistribution("intention_safe_distance_midpoint", "classified_west.csv", colreg_idx, cpa_dist_idx, multiply, n_bins, head_on);
+			net.setAisDistribution("intention_safe_distance", "classified_west.csv", colreg_idx, cpa_dist_idx, multiply, n_bins, overtake);
+			net.setAisDistribution("intention_safe_distance_front", "classified_west.csv", colreg_idx, cpa_dist_idx, multiply, n_bins, crossing);
 
 
 		}

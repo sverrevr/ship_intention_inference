@@ -190,7 +190,7 @@ public:
         setDefinition(node_name, CPT);
     }
 
-    void setAisDistribution(const std::string node_name, std::string filename, int colreg_idx, int cpa_dist_idx, int multiply, int n_bins){
+    void setAisDistribution(const std::string node_name, std::string filename, int colreg_idx, int cpa_dist_idx, int multiply, int n_bins, int col_sit){
         std::vector<std::vector<std::string> > content = read_file(filename);
         std::map<int, std::vector<double> > ais_cpa_map = aisMap(content, colreg_idx, cpa_dist_idx, multiply);
         std::map<int, std::vector<double> > distr_cpa_map = distributionMap(ais_cpa_map, n_bins);
@@ -203,7 +203,7 @@ public:
         for(std::map<int, std::vector<double> >::iterator it=distr_cpa_map.begin(); it != distr_cpa_map.end(); ++it){
             int col = (*it).first;
             std::vector<double> inVect = (*it).second;
-            if(col == -2){
+            if(col == col_sit){
                 for(int i=0; i < CPT.GetSize()-1; ++i){
                     CPT[i]= inVect[i];
                     std::cout << CPT[i] << " ";
