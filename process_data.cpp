@@ -101,31 +101,19 @@ std::map<int, std::vector<double> > aisMap(std::vector<std::vector<std::string> 
     for(int i=1;i<content.size();i++){   //start at 1 to not include name 
         std::string colreg_situation = content[i][cpa_idx];
         int col = stoi(colreg_situation);
-        if((content[i][cpa_idx] != "0.0") ){   //SE PÅ!
-            
+        double cpa_val = stod(content[i][cpa_idx]);
+        if((cpa_val!= 0.0)|| (cpa_val != 0)  ){   
             if(col == -2){
-                std::string cpa_val_OTGW = content[i][cpa_idx];  // index kan variere 
-                double cpa_OTGW = stod(cpa_val_OTGW)*timestep; // have spaces in some?
-                if(cpa_OTGW != 0){                           // driving in oposite directions for pre and post_man_t_cpa
-                    ais_cases[-2].push_back(cpa_OTGW);
-                }
-
+                double cpa_OTGW = cpa_val*timestep; 
+                ais_cases[-2].push_back(cpa_OTGW);
             }
             else if(col == -1){
-                std::string cpa_val_CRGW = content[i][cpa_idx];
-                double cpa_CRGW = stod(cpa_val_CRGW)*timestep;
-                
-
-                if(cpa_CRGW != 0){
-                    ais_cases[-1].push_back(cpa_CRGW);
-                }
+                double cpa_CRGW = cpa_val*timestep;
+                ais_cases[-1].push_back(cpa_CRGW);
             }
             else{
-                std::string cpa_val_HO = content[i][cpa_idx];
-                double cpa_HO = stod(cpa_val_HO)*timestep;
-                if(cpa_HO != 0){
-                    ais_cases[3].push_back(cpa_HO);
-                }
+                double cpa_HO = cpa_val*timestep;
+                ais_cases[3].push_back(cpa_HO);
             }
         }
         
@@ -197,7 +185,7 @@ int main(){
     int pre_man_cpa_own_idx = 8;
     int post_man_cpa_own_idx = 9;
     
-    const std::string filename2 = "classified_west_new3.csv";
+    const std::string filename2 = "data/classified_west_new3.csv";
     /*
     int colreg_idx_2 = 42;
     int cpa_dist_idx_2 = 37;
