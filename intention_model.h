@@ -249,9 +249,10 @@ namespace INTENTION_INFERENCE
 			// Cpa distance
 			net.setAisDistribution("intention_safe_distance_midpoint", "classified_west_5.csv", colreg_idx, cpa_dist_idx, multiply, n_bins, head_on);
 			net.setAisDistribution("intention_safe_distance", "classified_west_5.csv", colreg_idx, cpa_dist_idx, multiply, n_bins, overtake);
-			net.setAisDistribution("intention_safe_distance_front", "classified_west_5.csv", colreg_idx, cpa_dist_idx, multiply, n_bins, crossing);
+			//net.setAisDistribution("intention_safe_distance_front", "classified_west_5.csv", colreg_idx, cpa_dist_idx, multiply, n_bins, crossing);
 			// Cpa time
-			net.setAisDistribution("intention_ample_time", "classified_west_5.csv", colreg_idx, cpa_ample_time_idx, multiply, n_bins, head_on);
+			net.setAisDistribution("intention_ample_time", "classified_west_5.csv", colreg_idx, cpa_ample_time_idx, multiply, n_bins, head_on);  //head on
+			
 
 
 		}
