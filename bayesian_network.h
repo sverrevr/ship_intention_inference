@@ -198,7 +198,7 @@ public:
         auto node_definition = net.GetNode(node_id)->Definition();
         DSL_doubleArray CPT(node_definition->GetMatrix()->GetSize());  //henter ut matrix i baysian network
         // CPT = distr_map[-2];
-        std::cout << "\n Distribution added: \n";
+        std::cout << "\n Distribution added for colreg sit (" <<col_sit<<") :\n" ;
         double sum = 0;
         for(std::map<int, std::vector<double> >::iterator it=distr_cpa_map.begin(); it != distr_cpa_map.end(); ++it){
             int col = (*it).first;
@@ -211,6 +211,30 @@ public:
                 }
             }
         }
+        if(sum<0.9999 || sum>1.0001 || !isfinite(sum)){
+            double error = 1.0000-sum;
+            CPT[CPT.GetSize()-1] +=  error;
+        }
+        setDefinition(node_name, CPT);
+        std::cout << "\n";
+    }
+
+      void setAmpleTimeDistribution(const std::string node_name, std::string filename, int ample_time_idx, int timestep, int n_bins){
+        std::vector<std::vector<std::string> > content = read_file(filename);
+        std::vector<double> ample_time_vec = ampleTimeVec(content, ample_time_idx, timestep);
+        std::vector<double> distr_ample_time_vec = find_distribution(ample_time_vec, n_bins);
+        const auto node_id = getNodeId(node_name);
+        auto node_definition = net.GetNode(node_id)->Definition();
+        DSL_doubleArray CPT(node_definition->GetMatrix()->GetSize());  //henter ut matrix i baysian network
+
+        std::cout << "\n Distribution added for ample time :\n" ;
+        double sum = 0;
+        
+        for(int i=0; i < CPT.GetSize()-1; ++i){
+                    CPT[i]= distr_ample_time_vec[i];
+                    std::cout << CPT[i] << " ";
+                    sum += CPT[i];
+            }
         if(sum<0.9999 || sum>1.0001 || !isfinite(sum)){
             double error = 1.0000-sum;
             CPT[CPT.GetSize()-1] +=  error;

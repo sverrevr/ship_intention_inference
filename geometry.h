@@ -578,20 +578,17 @@ namespace INTENTION_INFERENCE
 		for(int i=1;i<content.size();i++){   //start at 1 to not include name 
 			std::string colreg_situation = content[i][colreg_idx];
 			int col = stoi(colreg_situation);
-
+			std::string cpa_val = content[i][cpa_idx];
 			if(col == -2){
-				std::string cpa_val_OTGW = content[i][cpa_idx];
-				double cpa_OTGW = stod(cpa_val_OTGW)*timestep;
+				double cpa_OTGW = stod(cpa_val)*timestep;
 				ais_cases[-2].push_back(cpa_OTGW);
 			}
 			else if(col == -1){
-				std::string cpa_val_CRGW = content[i][cpa_idx];
-				double cpa_CRGW = stod(cpa_val_CRGW)*timestep;
+				double cpa_CRGW = stod(cpa_val)*timestep;
 				ais_cases[-1].push_back(cpa_CRGW);
 			}
 			else{
-				std::string cpa_val_HO = content[i][cpa_idx];
-				double cpa_HO = stod(cpa_val_HO)*timestep;
+				double cpa_HO = stod(cpa_val)*timestep;
 				ais_cases[3].push_back(cpa_HO);
 			}
 		}
@@ -644,6 +641,20 @@ namespace INTENTION_INFERENCE
 			}
 		return distributionMap;
 	}
+
+	inline std::vector<double> ampleTimeVec(std::vector<std::vector<std::string> > content, int ample_time_idx, int timestep){
+		std::vector<double> ample_time_cases;
+		
+		for(int i=1;i<content.size();i++){   //start at 1 to not include name 
+			
+			std::string ample_time_val = content[i][ample_time_idx];
+			double ample_time = stod(ample_time_val)*timestep;
+			ample_time_cases.push_back(ample_time);
+
+		}
+		return ample_time_cases;
+	} 
+
 
 
 } // namespace INTENTION_INFERENCE
