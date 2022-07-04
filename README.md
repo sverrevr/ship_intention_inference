@@ -1,5 +1,7 @@
 # ship_intention_inference
 
+
+Going from continuous to discrete:
 intention_model_continious.xdsl is used to design the network but must be discretized before use. 
 This is done by opening the model in Genie (https://www.bayesfusion.com/) then opening the menu "Network" and pressing Discretize. 
 The network must then be made dynamic, this is done by choosing "Network" - "Dynamic Models" - "Enable temporal plate"
