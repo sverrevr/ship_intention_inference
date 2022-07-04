@@ -250,11 +250,10 @@ namespace INTENTION_INFERENCE
 			net.setAisDistribution("intention_safe_distance_midpoint", "classified_west_5.csv", colreg_idx, cpa_dist_idx, multiply, n_bins, head_on);
 			net.setAisDistribution("intention_safe_distance", "classified_west_5.csv", colreg_idx, cpa_dist_idx, multiply, n_bins, overtake);
 			//net.setAisDistribution("intention_safe_distance_front", "classified_west_5.csv", colreg_idx, cpa_dist_idx, multiply, n_bins, crossing);
-			// Cpa time
+			
+			// Cpa time, the model does differ for the differebt situations
 			net.setAisDistribution("intention_ample_time", "classified_west_5.csv", colreg_idx, cpa_ample_time_idx, multiply, n_bins, head_on);  //head on
 			
-
-
 		}
 
 		bool insertObservation(const IntentionModelParameters &parameters, const std::map<int, Eigen::Vector4d> &ship_states, std::vector<int> currently_tracked_ships, bool is_changing_course, double time, std::ofstream &intentionFile)

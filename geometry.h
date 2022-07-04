@@ -630,9 +630,9 @@ namespace INTENTION_INFERENCE
 
 		return dist;
 	}
-
-	inline std::map<int, std::vector<double> > distributionMap(std::map<int, std::vector<double> > ais_map, int n_bins){
-		std::map<int, std::vector<double> > distributionMap;
+	
+	inline std::vector<double> distributionMap(std::vector<double> vec, int n_bins){
+		std::vector<double> distr_vec;
 		for(std::map<int, std::vector<double> >::iterator it=ais_map.begin(); it != ais_map.end(); ++it){
 				int col = (*it).first;
 				std::vector<double> inVect = (*it).second;
@@ -641,6 +641,20 @@ namespace INTENTION_INFERENCE
 			}
 		return distributionMap;
 	}
+
+	inline std::vector<double> ampleTimeVec(std::vector<std::vector<std::string> > content, int ample_time_idx, int timestep){
+		std::vector<double> ample_time_cases;
+		
+		for(int i=1;i<content.size();i++){   //start at 1 to not include name 
+			
+			std::string ample_time_val = content[i][ample_time_idx];
+			double ample_time = stod(ample_time_val)*timestep;
+			ample_time_cases.push_back(ample_time);
+
+		}
+		return ample_time_cases;
+	} 
+
 
 
 } // namespace INTENTION_INFERENCE
