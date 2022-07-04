@@ -83,11 +83,11 @@ namespace INTENTION_INFERENCE
 
 			auto intention_colregs_compliant = better_at(better_at(result, "intention_colregs_compliant"), "true");
 			intentionFile << intention_colregs_compliant << ",";
-			std::cout << "intention_colregs_compliant: " << intention_colregs_compliant << std::endl;
+			//std::cout << "intention_colregs_compliant: " << intention_colregs_compliant << std::endl;
 			auto intention_ignoring_safety = better_at(better_at(result, "intention_ignoring_safety"), "true");
 			auto intention_good_seamanship = better_at(better_at(result, "intention_good_seamanship"), "true");
 			intentionFile << intention_good_seamanship << ",";
-			std::cout << "intention_good_seamanship: " << intention_good_seamanship << std::endl;
+			//std::cout << "intention_good_seamanship: " << intention_good_seamanship << std::endl;
 			auto intention_unmodeled_behaviour = better_at(better_at(result, "unmodelled_behaviour"), "true");
 			intentionFile << intention_unmodeled_behaviour << ",";
 			//std::cout << "intention_unmodeled_behaviour: " << intention_unmodeled_behaviour << std::endl;
@@ -109,28 +109,31 @@ namespace INTENTION_INFERENCE
 			std::transform(better_at(result, "intention_safe_distance_midpoint").begin(), better_at(result, "intention_safe_distance_midpoint").end(), std::back_inserter(node_state_msg->intention_safe_distance_midpoint), [](std::pair<std::string, double> v)
 						   { return (float)v.second; });*/
 
+
 			for (auto const &[ship_id, ship_name] : ship_name_map)
 			{
 				if (ship_id != my_id)
 				{
 
 					
-
-					auto intention_colav_situation_HO = better_at(better_at(result, "colav_situation_towards_" + ship_name), "HO");
-					//intentionFile << intention_colav_situation_HO << ",";
-					//std::cout << "intention_colav_situation_HO: " << intention_colav_situation_HO << std::endl;
-					auto intention_colav_situation_CR_SS = better_at(better_at(result, "colav_situation_towards_" + ship_name), "CR_SS");
-					//intentionFile << intention_colav_situation_CR_SS << ",";
-					//std::cout << "intention_colav_situation_CR_SS: " << intention_colav_situation_CR_SS << std::endl;
 					auto intention_colav_situation_CR_PS = better_at(better_at(result, "colav_situation_towards_" + ship_name), "CR_PS");
-					//intentionFile << intention_colav_situation_CR_PS << ",";
+					intentionFile << intention_colav_situation_CR_PS << ",";
 					//std::cout << "intention_colav_situation_CR_PS: " << intention_colav_situation_CR_PS << std::endl;
-					auto intention_colav_situation_OT_ing = better_at(better_at(result, "colav_situation_towards_" + ship_name), "OT_ing");
-					//intentionFile << intention_colav_situation_OT_ing << ",";
-					//std::cout << "intention_colav_situation_OT_ing: " << intention_colav_situation_OT_ing << std::endl;
+					auto intention_colav_situation_CR_SS = better_at(better_at(result, "colav_situation_towards_" + ship_name), "CR_SS");
+					intentionFile << intention_colav_situation_CR_SS << ",";
+					//std::cout << "intention_colav_situation_CR_SS: " << intention_colav_situation_CR_SS << std::endl;
+					auto intention_colav_situation_HO = better_at(better_at(result, "colav_situation_towards_" + ship_name), "HO");
+					intentionFile << intention_colav_situation_HO << ",";
+					//std::cout << "intention_colav_situation_HO: " << intention_colav_situation_HO << std::endl;
 					auto intention_colav_situation_OT_en = better_at(better_at(result, "colav_situation_towards_" + ship_name), "OT_en");
-					//intentionFile << intention_colav_situation_OT_en << ",";
+					intentionFile << intention_colav_situation_OT_en << ",";
 					//std::cout << "intention_colav_situation_OT_en: " << intention_colav_situation_OT_en << std::endl;
+					auto intention_colav_situation_OT_ing = better_at(better_at(result, "colav_situation_towards_" + ship_name), "OT_ing");
+					intentionFile << intention_colav_situation_OT_ing << ",";
+					//std::cout << "intention_colav_situation_OT_ing: " << intention_colav_situation_OT_ing << std::endl;
+
+				
+				
 
 					auto priority_intention_lower = better_at(better_at(result, "priority_intention_to_" + ship_name), "lower");
 					intentionFile << priority_intention_lower << ",";
@@ -230,7 +233,7 @@ namespace INTENTION_INFERENCE
 			net.setPriorNormalDistribution("intention_ample_time", parameters.ample_time_s.mu, parameters.ample_time_s.sigma, parameters.ample_time_s.max / parameters.ample_time_s.n_bins);
 			//net.setPriorNormalDistribution("intention_safe_distance", parameters.safe_distance_m.mu, parameters.safe_distance_m.sigma, parameters.safe_distance_m.max / parameters.safe_distance_m.n_bins);
 			//net.setPriorNormalDistribution("intention_safe_distance_midpoint", parameters.safe_distance_midpoint_m.mu, parameters.safe_distance_midpoint_m.sigma, parameters.safe_distance_midpoint_m.max / parameters.safe_distance_midpoint_m.n_bins);
-			//net.setPriorNormalDistribution("intention_safe_distance_front", parameters.safe_distance_front_m.mu, parameters.safe_distance_front_m.sigma, parameters.safe_distance_front_m.max / parameters.safe_distance_front_m.n_bins);
+			net.setPriorNormalDistribution("intention_safe_distance_front", parameters.safe_distance_front_m.mu, parameters.safe_distance_front_m.sigma, parameters.safe_distance_front_m.max / parameters.safe_distance_front_m.n_bins);
 			int colreg_idx = 7;
 			int cpa_ts_idx = 4;  // per nå lik r_maneuver_own (skal byttes til cpa_ts_idx)
 			int cpa_dist_idx = 6;
@@ -243,12 +246,12 @@ namespace INTENTION_INFERENCE
 			int crossing = -1;
 			net.setAisDistribution("intention_safe_distance_midpoint", "classified_west.csv", colreg_idx, cpa_dist_idx, multiply, n_bins, head_on);
 			net.setAisDistribution("intention_safe_distance", "classified_west.csv", colreg_idx, cpa_dist_idx, multiply, n_bins, overtake);
-			net.setAisDistribution("intention_safe_distance_front", "classified_west.csv", colreg_idx, cpa_dist_idx, multiply, n_bins, crossing);
+			//net.setAisDistribution("intention_safe_distance_front", "classified_west.csv", colreg_idx, cpa_dist_idx, multiply, n_bins, crossing);
 
 
 		}
 
-		bool insertObservation(const IntentionModelParameters &parameters, const std::map<int, Eigen::Vector4d> &ship_states, std::vector<int> currently_tracked_ships, bool is_changing_course, double time, std::ofstream &intentionFile)
+		bool insertObservation(const IntentionModelParameters parameters, int &ot_en, const std::map<int, Eigen::Vector4d> ship_states, std::vector<int> currently_tracked_ships, bool is_changing_course, double time, std::ofstream &intentionFile)
 		{
 
 			bool did_save = false;
@@ -286,8 +289,11 @@ namespace INTENTION_INFERENCE
 					const auto situation = evaluateSitution(parameters, better_at(ship_states, my_id), ship_state);
 					for (const auto &[name, value] : situation){
 						std::cout << name << "=" << value << ", ";
-						intentionFile << value << ",";
+						//intentionFile << value << ",";
 					}
+
+
+					
 			
 					//std::cout << "timeidentifyer: " << timeIdentifier(parameters, cpa.time_untill_CPA) << std::endl;
 					net.setEvidence("time_untill_closest_point_of_approach_towards_" + ship_name, timeIdentifier(parameters, cpa.time_untill_CPA));

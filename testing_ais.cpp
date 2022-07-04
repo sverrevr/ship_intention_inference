@@ -11,6 +11,8 @@
 #include <cmath>
 #include "intention_model.h"
 #include "parameters.h"
+#include "geometry.h"
+#include "utils.h"
 #include "Eigen/Dense"
 #include <map>
 
@@ -20,7 +22,7 @@ void readFileToVecs (std::string filename, std::vector<int> &mmsi_vec, std::vect
 
     int mmsi;
     time_t time;
-    double time_1;
+    double time_d;
     double x, y, sog, cog;
     std::string str;
     double time_null = 0;
@@ -39,7 +41,7 @@ void readFileToVecs (std::string filename, std::vector<int> &mmsi_vec, std::vect
             std::istringstream ss(token);
             ss >> std::get_time(&td, "%Y-%m-%d %H:%M:%S"); // or just %T in this case
             std::time_t time = mktime(&td);
-            time_1 = time;
+            time_d = time;
             //std::tm local = *std::localtime(&time);
             //std::cout << "local: " << std::put_time(&local, "%c %Z") << '\n';
             
@@ -58,20 +60,20 @@ void readFileToVecs (std::string filename, std::vector<int> &mmsi_vec, std::vect
             y_vec.push_back(y);
             sog_vec.push_back(sog);
 
-            double cog_n = cog;
-            double cog_rad = cog_n*M_PI/180;
+            double cog_rad = cog*M_PI/180;
             cog_vec.push_back(cog_rad);
             if (time_vec.empty()){
-                //std::cout << "0: " << time_1 << std::endl;
-                time_vec.push_back(time_1);
+                time_vec.push_back(time_d);
             }
             else {
-                //std::cout << "for: " << time_1 << std::endl;
-                double time_from_null = time_1-time_vec[0];
+                double time_from_null = time_d-time_vec[0];
                 time_vec.push_back(time_from_null);
             }
         }
         time_vec[0]=0;
+    }
+    else{
+				std::cout << "Could not open file";
     }
 }
 
@@ -104,23 +106,33 @@ std::vector<int> getShipList(std::vector<int> mmsi_vec){
     return ship_list;
 }
 
+/*void ensure_initialization(std::map<int, INTENTION_INFERENCE::IntentionModel> ship_intentions){
+		for (auto& [ship_id, current_ship_intention_model] : ship_intentions){
+			// Initiate ships that are not the own-ship, that have not already been initiated, and that are sufficiently close
+			if (ship_id != OWN_SHIP_ID && !ship_intentions.count(ship_id) && evaluateDistance(better_at(ship_states, ship_id)[PX] - better_at(ship_states, OWN_SHIP_ID)[PX], better_at(ship_states, ship_id)[PY] - better_at(ship_states, OWN_SHIP_ID)[PY]) < starting_distance){
+				ship_intentions.insert({ship_id, IntentionModel(network_filename, intention_model_parameters, ship_id, ship_states)});
+			}
+		}
+	}*/
 
-void writeIntentionToFile(INTENTION_INFERENCE::IntentionModelParameters parameters, std::string filename, std::map<int, INTENTION_INFERENCE::IntentionModel> ship_intentions, std::vector<std::map<int, Eigen::Vector4d > > ship_state, std::vector<int> ship_list, std::vector<double> unique_time_vec, std::vector<double> x_vec, std::vector<double> y_vec){
+
+void writeIntentionToFile(int timestep, INTENTION_INFERENCE::IntentionModelParameters parameters, std::string filename, std::map<int, INTENTION_INFERENCE::IntentionModel> ship_intentions, std::vector<std::map<int, Eigen::Vector4d > > ship_state, std::vector<int> ship_list, std::vector<double> unique_time_vec, std::vector<double> x_vec, std::vector<double> y_vec){
     std::ofstream intentionFile;
-    std::string filename_intention = "dist_intention_"+filename;
+    std::string filename_intention = "intention_files/dist_intention_"+filename;
     intentionFile.open (filename_intention);
-    intentionFile << "mmsi,x,y,time,CR_PS,CR_SS,HO,OT_en,OT_ing,colreg_compliant,good_seamanship,unmodeled_behaviour,priority_lower,priority_similar,priority_higher\n"; //,CR_SS2,CR_PS2,OT_ing2,OT_en2,priority_lower2,priority_similar2,priority_higher2\n";
+    intentionFile << "mmsi,x,y,time,colreg_compliant,good_seamanship,unmodeled_behaviour,CR_PS,CR_SS,HO,OT_en,OT_ing,priority_lower,priority_similar,priority_higher\n"; //,CR_SS2,CR_PS2,OT_ing2,OT_en2,priority_lower2,priority_similar2,priority_higher2\n";
     
-    for(int i = 1; i < unique_time_vec.size() ; i++){ //from 1 because first state might be NaN
+    for(int i = timestep; i < unique_time_vec.size() ; i++){ //from 1 because first state might be NaN
         std::cout << "timestep: " << i << std::endl;
         int j= 0;
+        int ot_en = 0;
         for(auto& [ship_id, current_ship_intention_model] : ship_intentions){
             std::cout << "ship_id" << ship_id << std::endl;
             intentionFile << ship_id << ",";
             intentionFile << x_vec[unique_time_vec.size()*j+i] << ",";
             intentionFile << y_vec[unique_time_vec.size()*j+i] << ","; 
             intentionFile << unique_time_vec[i] << ",";
-            current_ship_intention_model.insertObservation(parameters, ship_state[i], ship_list, false, unique_time_vec[i], intentionFile);
+            current_ship_intention_model.insertObservation(parameters,ot_en, ship_state[i], ship_list, false, unique_time_vec[i], intentionFile);
             j++;
     }
    }
@@ -134,6 +146,7 @@ INTENTION_INFERENCE::IntentionModelParameters setModelParameters(int num_ships){
     param.number_of_network_evaluation_samples = 100000;
 	param.max_number_of_obstacles = num_ships-1; //must be set to num_ships-1 or else segmantation fault
 	param.time_into_trajectory = 10;
+    param.starting_distance = 10000;
 	param.expanding_dbn.min_time_s = 10;
 	param.expanding_dbn.max_time_s = 1200;
 	param.expanding_dbn.min_course_change_rad = 0.13;
@@ -143,7 +156,7 @@ INTENTION_INFERENCE::IntentionModelParameters setModelParameters(int num_ships){
 	param.ample_time_s.max = 1000;
 	param.ample_time_s.n_bins = 30; // this value must match the bayesian network
 	param.ample_time_s.minimal_accepted_by_ownship = 20;
-	param.safe_distance_m.mu = 15;
+    param.safe_distance_m.mu = 15;
 	param.safe_distance_m.sigma = 2.5;
 	param.safe_distance_m.max = 30;
 	param.safe_distance_m.n_bins = 30; // this value must match the bayesian network
@@ -177,15 +190,16 @@ INTENTION_INFERENCE::IntentionModelParameters setModelParameters(int num_ships){
 
 
 int main(){
+    using namespace INTENTION_INFERENCE;
     
 	int num_ships = 2;
     //std::string filename = "new_Case_LQLVS-60-sec.csv"; //crossing
     //std::string filename = "new_Case - 04-12-2019, 20-10-56 - DOTVP-two-ships-60-sec-kopi.csv";
     //std::string filename = "new_case_2ZC9Z-60-sec-two-ships.csv"; //head on
-    //std::string filename = "new_Case - 01-08-2021, 08-21-29 - AQ5VM-60-sec-two-ships.csv"; //overtaking
+    std::string filename = "new_Case - 01-08-2021, 08-21-29 - AQ5VM-60-sec-two-ships.csv"; //overtaking must start at timestep 4
     //std::string filename = "new_Case - 01-15-2020, 09-05-49 - VATEN-60-sec-two-ships.csv"; //overtaking
     //std::string filename = "new_Case - 01-09-2018, 01-11-37 - RT3LY-60-sec-two-ships-filled.csv"; //head-on
-    std::string filename = "new_Case - 01-09-2018, 01-45-02 - 19JNJ-60-sec-two-ships.csv";
+    //std::string filename = "new_Case - 01-09-2018, 01-45-02 - 19JNJ-60-sec-two-ships.csv";
 
     std::string intentionModelFilename = "intention_model_two_ships.xdsl";
 
@@ -207,12 +221,23 @@ int main(){
 
     std::map<int, INTENTION_INFERENCE::IntentionModel> ship_intentions;
 
-    for (int i = 0; i < num_ships; i++){
-        ship_intentions.insert(std::pair<int, INTENTION_INFERENCE::IntentionModel>(ship_list[i], INTENTION_INFERENCE::IntentionModel(intentionModelFilename,parameters,ship_list[i],ship_state[1]))); //ship_state[1] as initial as first state might be NaN
-    }
+    int timestep = 1;
+    bool inserted = false;
 
-    
-    writeIntentionToFile(parameters,filename, ship_intentions, ship_state, ship_list, unique_time_vec, x_vec,y_vec); //intentionfile is called: intention_<filename>  NB: not all intentions!
+   while (!inserted){
+        for (int i = 0; i < num_ships; i++){
+            double dist = evaluateDistance(INTENTION_INFERENCE::better_at(ship_state[timestep], ship_list[1])[INTENTION_INFERENCE::PX] - INTENTION_INFERENCE::better_at(ship_state[timestep], ship_list[2])[INTENTION_INFERENCE::PX], INTENTION_INFERENCE::better_at(ship_state[timestep], ship_list[1])[INTENTION_INFERENCE::PY] - INTENTION_INFERENCE::better_at(ship_state[timestep], ship_list[2])[INTENTION_INFERENCE::PY]);
+            std::cout<< "dist: " << dist << std::endl;
+            if (dist < parameters.starting_distance){
+            ship_intentions.insert(std::pair<int, INTENTION_INFERENCE::IntentionModel>(ship_list[i], INTENTION_INFERENCE::IntentionModel(intentionModelFilename,parameters,ship_list[i],ship_state[timestep]))); //ship_state[1] as initial as first state might be NaN
+            inserted = true;
+            }
+        }
+        timestep ++;
+   }
+
+
+    writeIntentionToFile(timestep, parameters,filename, ship_intentions, ship_state, ship_list, unique_time_vec, x_vec,y_vec); //intentionfile is called: intention_<filename>  NB: not all intentions!
     
 
     /* OLD PRINTS
