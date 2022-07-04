@@ -237,7 +237,7 @@ namespace INTENTION_INFERENCE
 			//int colreg_idx = 7;
 			//int cpa_ts_idx = 4;  // per nå lik r_maneuver_own (skal byttes til cpa_ts_idx)
 
-			//net.setPriorNormalDistribution("intention_safe_distance_front", parameters.safe_distance_front_m.mu, parameters.safe_distance_front_m.sigma, parameters.safe_distance_front_m.max / parameters.safe_distance_front_m.n_bins);
+			net.setPriorNormalDistribution("intention_safe_distance_front", parameters.safe_distance_front_m.mu, parameters.safe_distance_front_m.sigma, parameters.safe_distance_front_m.max / parameters.safe_distance_front_m.n_bins);
 
 			
 
