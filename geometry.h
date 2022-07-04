@@ -630,9 +630,9 @@ namespace INTENTION_INFERENCE
 
 		return dist;
 	}
-	
-	inline std::vector<double> distributionMap(std::vector<double> vec, int n_bins){
-		std::vector<double> distr_vec;
+
+	inline std::map<int, std::vector<double> > distributionMap(std::map<int, std::vector<double> > ais_map, int n_bins){
+		std::map<int, std::vector<double> > distributionMap;
 		for(std::map<int, std::vector<double> >::iterator it=ais_map.begin(); it != ais_map.end(); ++it){
 				int col = (*it).first;
 				std::vector<double> inVect = (*it).second;
