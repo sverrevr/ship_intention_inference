@@ -1,0 +1,936 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This network was created in GeNIe Academic, which can be used for academic teaching and research purposes only -->
+<smile version="1.0" id="Network4" numsamples="10000" discsamples="100000">
+	<nodes>
+		<cpt id="intention_unmodeled_behaviour">
+			<state id="false" />
+			<state id="true" />
+			<probabilities>0.001 0.999</probabilities>
+		</cpt>
+		<cpt id="passed_ship0">
+			<state id="false" />
+			<state id="true" />
+			<probabilities>0.5 0.5</probabilities>
+		</cpt>
+		<equation id="intention_safe_distance">
+			<definition lower="0" upper="45">intention_safe_distance=Min(TruncNormal(25,7.5,0),45)</definition>
+			<discretization>
+				<interval label="State0" upper="1.5" />
+				<interval label="State1" upper="3" />
+				<interval label="State3" upper="4.5" />
+				<interval label="State4" upper="6" />
+				<interval label="State5" upper="7.5" />
+				<interval label="State6" upper="9" />
+				<interval label="State7" upper="10.5" />
+				<interval label="State8" upper="12" />
+				<interval label="State9" upper="13.5" />
+				<interval label="State10" upper="15" />
+				<interval label="State11" upper="16.5" />
+				<interval label="State12" upper="18" />
+				<interval label="State13" upper="19.5" />
+				<interval label="State14" upper="21" />
+				<interval label="State15" upper="22.5" />
+				<interval label="State16" upper="24" />
+				<interval label="State17" upper="25.5" />
+				<interval label="State18" upper="27" />
+				<interval label="State19" upper="28.5" />
+				<interval label="State20" upper="30" />
+				<interval label="State21" upper="31.5" />
+				<interval label="State22" upper="33" />
+				<interval label="State23" upper="34.5" />
+				<interval label="State24" upper="36" />
+				<interval label="State25" upper="37.5" />
+				<interval label="State26" upper="39" />
+				<interval label="State27" upper="40.5" />
+				<interval label="State28" upper="42" />
+				<interval label="State29" upper="43.5" />
+				<interval label="State30" upper="45" />
+			</discretization>
+		</equation>
+		<equation id="distance_at_cpa_towards_ship_0">
+			<definition lower="0" upper="600">distance_at_cpa_towards_ship_0=Uniform(0,600)</definition>
+			<discretization>
+				<interval label="State1" upper="20" />
+				<interval label="State2" upper="40" />
+				<interval label="State3" upper="60" />
+				<interval label="State4" upper="80" />
+				<interval label="State5" upper="100" />
+				<interval label="State6" upper="120" />
+				<interval label="State7" upper="140" />
+				<interval label="State8" upper="160" />
+				<interval label="State9" upper="180" />
+				<interval label="State10" upper="200" />
+				<interval label="State11" upper="220" />
+				<interval label="State12" upper="240" />
+				<interval label="State13" upper="260" />
+				<interval label="State14" upper="280" />
+				<interval label="State15" upper="300" />
+				<interval label="State16" upper="320" />
+				<interval label="State17" upper="340" />
+				<interval label="State18" upper="360" />
+				<interval label="State19" upper="380" />
+				<interval label="State20" upper="400" />
+				<interval label="State21" upper="420" />
+				<interval label="State22" upper="440" />
+				<interval label="State23" upper="460" />
+				<interval label="State24" upper="480" />
+				<interval label="State25" upper="500" />
+				<interval label="State26" upper="520" />
+				<interval label="State27" upper="540" />
+				<interval label="State28" upper="560" />
+				<interval label="State29" upper="580" />
+				<interval label="State30" upper="600" />
+			</discretization>
+		</equation>
+		<equation id="safe_distance_at_CPA_towards_ship0">
+			<parents>intention_safe_distance distance_at_cpa_towards_ship_0</parents>
+			<definition lower="0" upper="1">safe_distance_at_CPA_towards_ship0=distance_at_cpa_towards_ship_0&gt;intention_safe_distance</definition>
+			<discretization>
+				<interval label="false" upper="0.5" />
+				<interval label="true" upper="1" />
+			</discretization>
+		</equation>
+		<equation id="crossing_distance_front_towards_ship0">
+			<definition lower="0" upper="900">crossing_distance_front_towards_ship0=Uniform(0,900)</definition>
+			<discretization>
+				<interval label="State1" upper="30" />
+				<interval label="State2" upper="60" />
+				<interval label="State3" upper="90" />
+				<interval label="State4" upper="120" />
+				<interval label="State5" upper="150" />
+				<interval label="State6" upper="180" />
+				<interval label="State7" upper="210" />
+				<interval label="State8" upper="240" />
+				<interval label="State9" upper="270" />
+				<interval label="State10" upper="300" />
+				<interval label="State11" upper="330" />
+				<interval label="State12" upper="360" />
+				<interval label="State13" upper="390" />
+				<interval label="State14" upper="420" />
+				<interval label="State15" upper="450" />
+				<interval label="State16" upper="480" />
+				<interval label="State17" upper="510" />
+				<interval label="State18" upper="540" />
+				<interval label="State19" upper="570" />
+				<interval label="State20" upper="600" />
+				<interval label="State21" upper="630" />
+				<interval label="State22" upper="660" />
+				<interval label="State23" upper="690" />
+				<interval label="State24" upper="720" />
+				<interval label="State25" upper="750" />
+				<interval label="State26" upper="780" />
+				<interval label="State27" upper="810" />
+				<interval label="State28" upper="840" />
+				<interval label="State29" upper="870" />
+				<interval label="State30" upper="900" />
+			</discretization>
+		</equation>
+		<equation id="intention_safe_distance_front">
+			<definition lower="0" upper="60">intention_safe_distance_front=Min(TruncNormal(50,10,0),60)</definition>
+			<discretization>
+				<interval label="State0" upper="2" />
+				<interval label="State1" upper="4" />
+				<interval label="State3" upper="6" />
+				<interval label="State4" upper="8" />
+				<interval label="State5" upper="10" />
+				<interval label="State6" upper="12" />
+				<interval label="State7" upper="14" />
+				<interval label="State8" upper="16" />
+				<interval label="State9" upper="18" />
+				<interval label="State10" upper="20" />
+				<interval label="State11" upper="22" />
+				<interval label="State12" upper="24" />
+				<interval label="State13" upper="26" />
+				<interval label="State14" upper="28" />
+				<interval label="State15" upper="30" />
+				<interval label="State16" upper="32" />
+				<interval label="State17" upper="34" />
+				<interval label="State18" upper="36" />
+				<interval label="State19" upper="38" />
+				<interval label="State20" upper="40" />
+				<interval label="State21" upper="42" />
+				<interval label="State22" upper="44" />
+				<interval label="State23" upper="46" />
+				<interval label="State24" upper="48" />
+				<interval label="State25" upper="50" />
+				<interval label="State26" upper="52" />
+				<interval label="State27" upper="54" />
+				<interval label="State28" upper="56" />
+				<interval label="State29" upper="58" />
+				<interval label="State30" upper="60" />
+			</discretization>
+		</equation>
+		<equation id="safe_crossing_front_towards_ship0">
+			<parents>crossing_distance_front_towards_ship0 intention_safe_distance_front</parents>
+			<definition lower="0" upper="1">safe_crossing_front_towards_ship0=crossing_distance_front_towards_ship0&gt;intention_safe_distance_front</definition>
+			<discretization>
+				<interval label="false" upper="0.5" />
+				<interval label="true" upper="1" />
+			</discretization>
+		</equation>
+		<cpt id="intention_ignoring_safety">
+			<state id="false" />
+			<state id="true" />
+			<probabilities>0.5 0.5</probabilities>
+		</cpt>
+		<equation id="safe_distance_to_ship0">
+			<parents>safe_distance_at_CPA_towards_ship0 safe_crossing_front_towards_ship0 intention_ignoring_safety</parents>
+			<definition lower="0" upper="1">safe_distance_to_ship0=Or(And(safe_distance_at_CPA_towards_ship0&gt;0.5,safe_crossing_front_towards_ship0&gt;0.5),intention_ignoring_safety&gt;0.5)</definition>
+			<discretization>
+				<interval label="false" upper="0.5" />
+				<interval label="true" upper="1" />
+			</discretization>
+		</equation>
+		<equation id="safely_passed_ship_0">
+			<parents>passed_ship0 safe_distance_to_ship0</parents>
+			<definition lower="0" upper="1">safely_passed_ship_0=And(passed_ship0=&quot;true&quot;,safe_distance_to_ship0&gt;0.5)</definition>
+			<discretization>
+				<interval label="false" upper="0.5" />
+				<interval label="true" upper="1" />
+			</discretization>
+		</equation>
+		<cpt id="change_in_course">
+			<state id="portwards" />
+			<state id="none" />
+			<state id="starboardwards" />
+			<probabilities>0.3333333333333333 0.3333333333333333 0.3333333333333333</probabilities>
+		</cpt>
+		<cpt id="change_in_speed">
+			<state id="lower" />
+			<state id="similar" />
+			<state id="higher" />
+			<probabilities>0.3333333333333333 0.3333333333333333 0.3333333333333333</probabilities>
+		</cpt>
+		<equation id="stands_on_correct">
+			<parents>change_in_course change_in_speed</parents>
+			<definition lower="0" upper="1">stands_on_correct=And(change_in_course=&quot;none&quot;,change_in_speed=&quot;similar&quot;)</definition>
+			<discretization>
+				<interval label="false" upper="0.5" />
+				<interval label="true" upper="1" />
+			</discretization>
+		</equation>
+		<equation id="stands_on_correct_towards_or_forced_to_give_way">
+			<parents>stands_on_correct</parents>
+			<definition lower="0" upper="1">stands_on_correct_towards_or_forced_to_give_way=stands_on_correct</definition>
+			<discretization>
+				<interval label="false" upper="0.5" />
+				<interval label="true" upper="1" />
+			</discretization>
+		</equation>
+		<cpt id="colav_situation_towards_ship0">
+			<state id="HO" />
+			<state id="CR_SS" />
+			<state id="OT_ing" />
+			<state id="CR_PS" />
+			<state id="OT_en" />
+			<probabilities>0.2 0.2 0.2 0.2 0.2</probabilities>
+		</cpt>
+		<cpt id="priority_intention_to_ship0">
+			<state id="lower" />
+			<state id="similar" />
+			<state id="higher" />
+			<probabilities>0.05 0.9 0.05</probabilities>
+		</cpt>
+		<equation id="role_towards_ship_0">
+			<parents>colav_situation_towards_ship0 priority_intention_to_ship0</parents>
+			<definition lower="0" upper="1">role_towards_ship_0=If(priority_intention_to_ship0=&quot;lower&quot;,0,If(priority_intention_to_ship0=&quot;similar&quot;,colav_situation_towards_ship0&gt;2.5,1))</definition>
+			<discretization>
+				<interval label="GW" upper="0.5" />
+				<interval label="SO" upper="1" />
+			</discretization>
+		</equation>
+		<equation id="two_times_distance_to_midpoint_at_cpa_to_ship0">
+			<definition lower="0" upper="600">two_times_distance_to_midpoint_at_cpa_to_ship0=Uniform(0,600)</definition>
+			<discretization>
+				<interval label="State0" upper="20" />
+				<interval label="State1" upper="40" />
+				<interval label="State3" upper="60" />
+				<interval label="State4" upper="80" />
+				<interval label="State5" upper="100" />
+				<interval label="State6" upper="120" />
+				<interval label="State7" upper="140" />
+				<interval label="State8" upper="160" />
+				<interval label="State9" upper="180" />
+				<interval label="State10" upper="200" />
+				<interval label="State11" upper="220" />
+				<interval label="State12" upper="240" />
+				<interval label="State13" upper="260" />
+				<interval label="State14" upper="280" />
+				<interval label="State15" upper="300" />
+				<interval label="State16" upper="320" />
+				<interval label="State17" upper="340" />
+				<interval label="State18" upper="360" />
+				<interval label="State19" upper="380" />
+				<interval label="State20" upper="400" />
+				<interval label="State21" upper="420" />
+				<interval label="State22" upper="440" />
+				<interval label="State23" upper="460" />
+				<interval label="State24" upper="480" />
+				<interval label="State25" upper="500" />
+				<interval label="State26" upper="520" />
+				<interval label="State27" upper="540" />
+				<interval label="State28" upper="560" />
+				<interval label="State29" upper="580" />
+				<interval label="State30" upper="600" />
+			</discretization>
+		</equation>
+		<equation id="intention_safe_distance_midpoint">
+			<definition lower="0" upper="45">intention_safe_distance_midpoint=Min(TruncNormal(25,7.5,0),45)</definition>
+			<discretization>
+				<interval label="State0" upper="1.5" />
+				<interval label="State1" upper="3" />
+				<interval label="State3" upper="4.5" />
+				<interval label="State4" upper="6" />
+				<interval label="State5" upper="7.5" />
+				<interval label="State6" upper="9" />
+				<interval label="State7" upper="10.5" />
+				<interval label="State8" upper="12" />
+				<interval label="State9" upper="13.5" />
+				<interval label="State10" upper="15" />
+				<interval label="State11" upper="16.5" />
+				<interval label="State12" upper="18" />
+				<interval label="State13" upper="19.5" />
+				<interval label="State14" upper="21" />
+				<interval label="State15" upper="22.5" />
+				<interval label="State16" upper="24" />
+				<interval label="State17" upper="25.5" />
+				<interval label="State18" upper="27" />
+				<interval label="State19" upper="28.5" />
+				<interval label="State20" upper="30" />
+				<interval label="State21" upper="31.5" />
+				<interval label="State22" upper="33" />
+				<interval label="State23" upper="34.5" />
+				<interval label="State24" upper="36" />
+				<interval label="State25" upper="37.5" />
+				<interval label="State26" upper="39" />
+				<interval label="State27" upper="40.5" />
+				<interval label="State28" upper="42" />
+				<interval label="State29" upper="43.5" />
+				<interval label="State30" upper="45" />
+			</discretization>
+		</equation>
+		<equation id="safe_distance_to_midpoint_ship0">
+			<parents>two_times_distance_to_midpoint_at_cpa_to_ship0 intention_safe_distance_midpoint</parents>
+			<definition lower="0" upper="1">safe_distance_to_midpoint_ship0=two_times_distance_to_midpoint_at_cpa_to_ship0&gt;intention_safe_distance_midpoint</definition>
+			<discretization>
+				<interval label="false" upper="0.5" />
+				<interval label="true" upper="1" />
+			</discretization>
+		</equation>
+		<cpt id="crossing_with_midpoint_on_side_ship0">
+			<state id="port" />
+			<state id="starboard" />
+			<probabilities>0.5 0.5</probabilities>
+		</cpt>
+		<equation id="GW_HO_correct_ship0">
+			<parents>safe_distance_to_midpoint_ship0 crossing_with_midpoint_on_side_ship0 intention_ignoring_safety</parents>
+			<definition lower="0" upper="1">GW_HO_correct_ship0=And(Or(safe_distance_to_midpoint_ship0&gt;0.5,intention_ignoring_safety&gt;0.5),crossing_with_midpoint_on_side_ship0&lt;0.5)</definition>
+			<discretization>
+				<interval label="false" upper="0.5" />
+				<interval label="true" upper="1" />
+			</discretization>
+		</equation>
+		<cpt id="crossing_wiht_other_on_port_side_to_ship0">
+			<state id="port" />
+			<state id="starboard" />
+			<probabilities>0.5 0.5</probabilities>
+		</cpt>
+		<equation id="GW_CR_SS_corerct_ship0">
+			<parents>safe_distance_to_ship0 crossing_wiht_other_on_port_side_to_ship0</parents>
+			<definition lower="0" upper="1">GW_CR_SS_corerct_ship0=And(safe_distance_to_ship0&gt;0.5,crossing_wiht_other_on_port_side_to_ship0=&quot;port&quot;)</definition>
+			<discretization>
+				<interval label="false" upper="0.5" />
+				<interval label="true" upper="1" />
+			</discretization>
+		</equation>
+		<equation id="GW_OT_ing_correct_ship0">
+			<parents>safe_distance_to_ship0</parents>
+			<definition lower="0" upper="1">GW_OT_ing_correct_ship0=safe_distance_to_ship0&gt;0.5</definition>
+			<discretization>
+				<interval label="false" upper="0.5" />
+				<interval label="true" upper="1" />
+			</discretization>
+		</equation>
+		<equation id="GW_CR_PS_correct_ship0">
+			<parents>change_in_course safe_distance_to_ship0</parents>
+			<definition lower="0" upper="1">GW_CR_PS_correct_ship0=And(safe_distance_to_ship0&gt;0.5,1-(change_in_course=&quot;portwards&quot;))</definition>
+			<discretization>
+				<interval label="false" upper="0.5" />
+				<interval label="true" upper="1" />
+			</discretization>
+		</equation>
+		<equation id="GW_OT_en_correct_ship0">
+			<parents>safe_distance_to_ship0</parents>
+			<definition lower="0" upper="1">GW_OT_en_correct_ship0=safe_distance_to_ship0&gt;0.5</definition>
+			<discretization>
+				<interval label="false" upper="0.5" />
+				<interval label="true" upper="1" />
+			</discretization>
+		</equation>
+		<cpt id="intention_colregs_compliant">
+			<state id="false" />
+			<state id="true" />
+			<probabilities>0.1 0.9</probabilities>
+		</cpt>
+		<equation id="gives_way_correct_towards_ship0">
+			<parents>colav_situation_towards_ship0 GW_HO_correct_ship0 GW_CR_SS_corerct_ship0 GW_OT_ing_correct_ship0 GW_CR_PS_correct_ship0 GW_OT_en_correct_ship0</parents>
+			<definition lower="0" upper="1">gives_way_correct_towards_ship0=If(colav_situation_towards_ship0&lt;0.5,GW_HO_correct_ship0&gt;0.5,If(colav_situation_towards_ship0&lt;1.5,GW_CR_SS_corerct_ship0&gt;0.5,If(colav_situation_towards_ship0&lt;2.5,GW_OT_ing_correct_ship0&gt;0.5,If(colav_situation_towards_ship0&lt;3.5,GW_CR_PS_correct_ship0&gt;0.5,GW_OT_en_correct_ship0&gt;0.5))))</definition>
+			<discretization>
+				<interval label="false" upper="0.5" />
+				<interval label="true" upper="1" />
+			</discretization>
+		</equation>
+		<equation id="intention_ample_time">
+			<definition lower="0" upper="100">intention_ample_time=Min(TruncNormal(75,20,0),100)</definition>
+			<discretization>
+				<interval label="State0" upper="3.333333333333" />
+				<interval label="State1" upper="6.666666666667" />
+				<interval label="State3" upper="10" />
+				<interval label="State4" upper="13.33333333333" />
+				<interval label="State5" upper="16.66666666667" />
+				<interval label="State6" upper="20" />
+				<interval label="State7" upper="23.33333333333" />
+				<interval label="State8" upper="26.66666666667" />
+				<interval label="State9" upper="30" />
+				<interval label="State10" upper="33.33333333333" />
+				<interval label="State11" upper="36.66666666667" />
+				<interval label="State12" upper="40" />
+				<interval label="State13" upper="43.33333333333" />
+				<interval label="State14" upper="46.66666666667" />
+				<interval label="State15" upper="50" />
+				<interval label="State16" upper="53.33333333333" />
+				<interval label="State17" upper="56.66666666667" />
+				<interval label="State18" upper="60" />
+				<interval label="State19" upper="63.33333333333" />
+				<interval label="State20" upper="66.66666666667" />
+				<interval label="State21" upper="70" />
+				<interval label="State22" upper="73.33333333333" />
+				<interval label="State23" upper="76.66666666667" />
+				<interval label="State24" upper="80" />
+				<interval label="State25" upper="83.33333333333" />
+				<interval label="State26" upper="86.66666666667" />
+				<interval label="State27" upper="90" />
+				<interval label="State28" upper="93.33333333333" />
+				<interval label="State29" upper="96.66666666667" />
+				<interval label="State30" upper="100" />
+			</discretization>
+		</equation>
+		<equation id="time_untill_closest_point_of_approach_towards_ship0">
+			<definition lower="0" upper="600">time_untill_closest_point_of_approach_towards_ship0=Uniform(0,600)</definition>
+			<discretization>
+				<interval label="State1" upper="20" />
+				<interval label="State2" upper="40" />
+				<interval label="State3" upper="60" />
+				<interval label="State4" upper="80" />
+				<interval label="State5" upper="100" />
+				<interval label="State6" upper="120" />
+				<interval label="State7" upper="140" />
+				<interval label="State8" upper="160" />
+				<interval label="State9" upper="180" />
+				<interval label="State10" upper="200" />
+				<interval label="State11" upper="220" />
+				<interval label="State12" upper="240" />
+				<interval label="State13" upper="260" />
+				<interval label="State14" upper="280" />
+				<interval label="State15" upper="300" />
+				<interval label="State16" upper="320" />
+				<interval label="State17" upper="340" />
+				<interval label="State18" upper="360" />
+				<interval label="State19" upper="380" />
+				<interval label="State20" upper="400" />
+				<interval label="State21" upper="420" />
+				<interval label="State22" upper="440" />
+				<interval label="State23" upper="460" />
+				<interval label="State24" upper="480" />
+				<interval label="State25" upper="500" />
+				<interval label="State26" upper="520" />
+				<interval label="State27" upper="540" />
+				<interval label="State28" upper="560" />
+				<interval label="State29" upper="580" />
+				<interval label="State30" upper="600" />
+			</discretization>
+		</equation>
+		<equation id="is_pre_ample_time_to_ship0">
+			<parents>intention_ample_time time_untill_closest_point_of_approach_towards_ship0</parents>
+			<definition lower="0" upper="1">is_pre_ample_time_to_ship0=time_untill_closest_point_of_approach_towards_ship0&gt;intention_ample_time</definition>
+			<discretization>
+				<interval label="false" upper="0.5" />
+				<interval label="true" upper="1" />
+			</discretization>
+		</equation>
+		<cpt id="intention_good_seamanship">
+			<state id="false" />
+			<state id="true" />
+			<probabilities>0.01 0.99</probabilities>
+		</cpt>
+		<cpt id="has_turned_portwards_t_1">
+			<state id="false" />
+			<state id="true" />
+			<probabilities>0.5 0.5</probabilities>
+		</cpt>
+		<cpt id="has_turned_portwards">
+			<state id="false" />
+			<state id="true" />
+			<parents>has_turned_portwards_t_1 change_in_course</parents>
+			<probabilities>0 1 1 0 1 0 0 1 0 1 0 1</probabilities>
+		</cpt>
+		<cpt id="has_turned_starboardwards_t_1">
+			<state id="false" />
+			<state id="true" />
+			<probabilities>0.5 0.5</probabilities>
+		</cpt>
+		<cpt id="has_turned_starboardwards">
+			<state id="false" />
+			<state id="true" />
+			<parents>has_turned_starboardwards_t_1 change_in_course</parents>
+			<probabilities>1 0 1 0 0 1 0 1 0 1 0 1</probabilities>
+		</cpt>
+		<cpt id="good_seamanship">
+			<state id="false" />
+			<state id="true" />
+			<parents>intention_good_seamanship has_turned_portwards has_turned_starboardwards crossing_wiht_other_on_port_side_to_ship0</parents>
+			<probabilities>0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 1 0 1 0 0 1 1 0 1 0</probabilities>
+		</cpt>
+		<cpt id="is_changing_course">
+			<state id="false" />
+			<state id="true" />
+			<probabilities>0.5 0.5</probabilities>
+		</cpt>
+		<equation id="GWC_or_pre_ample_time_towards_ship0">
+			<parents>gives_way_correct_towards_ship0 is_pre_ample_time_to_ship0 stands_on_correct_towards_or_forced_to_give_way is_changing_course</parents>
+			<definition lower="0" upper="1">GWC_or_pre_ample_time_towards_ship0=Or(gives_way_correct_towards_ship0&gt;0.5,And(is_pre_ample_time_to_ship0&gt;0.5,stands_on_correct_towards_or_forced_to_give_way&gt;0.5),is_changing_course=&quot;true&quot;)</definition>
+			<discretization>
+				<interval label="false" upper="0.5" />
+				<interval label="true" upper="1" />
+			</discretization>
+		</equation>
+		<equation id="Observation_applicable_towards_ship0">
+			<parents>safely_passed_ship_0 stands_on_correct_towards_or_forced_to_give_way role_towards_ship_0 GWC_or_pre_ample_time_towards_ship0 intention_colregs_compliant safe_distance_to_ship0 good_seamanship</parents>
+			<definition lower="0" upper="1">Observation_applicable_towards_ship0=Or(safely_passed_ship_0&gt;0.5,Or(And(role_towards_ship_0&gt;0.5,stands_on_correct_towards_or_forced_to_give_way&gt;0.5),And(role_towards_ship_0&lt;0.5,GWC_or_pre_ample_time_towards_ship0&gt;0.5,good_seamanship&gt;0.5),And(intention_colregs_compliant&lt;0.5,safe_distance_to_ship0&gt;0.5,good_seamanship&gt;0.5)))</definition>
+			<discretization>
+				<interval label="false" upper="0.5" />
+				<interval label="true" upper="1" />
+			</discretization>
+		</equation>
+		<equation id="observation_applicable">
+			<parents>intention_unmodeled_behaviour Observation_applicable_towards_ship0</parents>
+			<definition lower="0" upper="1">observation_applicable=Or(intention_unmodeled_behaviour&lt;0.5,Observation_applicable_towards_ship0&gt;0.5)</definition>
+			<discretization>
+				<interval label="false" upper="0.5" />
+				<interval label="true" upper="1" />
+			</discretization>
+		</equation>
+		<equation id="ample_time_acceptable">
+			<parents>intention_ample_time</parents>
+			<definition lower="0" upper="1">ample_time_acceptable=intention_ample_time&gt;60</definition>
+			<discretization>
+				<interval label="false" upper="0.5" />
+				<interval label="true" upper="1" />
+			</discretization>
+		</equation>
+		<equation id="safe_distance_acceptable">
+			<parents>intention_safe_distance</parents>
+			<definition lower="0" upper="1">safe_distance_acceptable=intention_safe_distance&gt;100</definition>
+			<discretization>
+				<interval label="false" upper="0.5" />
+				<interval label="true" upper="1" />
+			</discretization>
+		</equation>
+		<equation id="safe_distance_midpoint_acceptable">
+			<parents>intention_safe_distance_midpoint</parents>
+			<definition lower="0" upper="1">safe_distance_midpoint_acceptable=intention_safe_distance_midpoint&gt;75</definition>
+			<discretization>
+				<interval label="false" upper="0.5" />
+				<interval label="true" upper="1" />
+			</discretization>
+		</equation>
+		<equation id="safe_distance_front_acceptable">
+			<parents>intention_safe_distance_front</parents>
+			<definition lower="0" upper="1">safe_distance_front_acceptable=intention_safe_distance_front&gt;100</definition>
+			<discretization>
+				<interval label="false" upper="0.5" />
+				<interval label="true" upper="1" />
+			</discretization>
+		</equation>
+		<equation id="will_give_way_to_ship0">
+			<parents>safe_distance_acceptable safe_distance_front_acceptable safe_distance_midpoint_acceptable intention_unmodeled_behaviour ample_time_acceptable role_towards_ship_0</parents>
+			<definition lower="0" upper="1">will_give_way_to_ship0=And(safe_distance_acceptable&gt;0.5,safe_distance_front_acceptable&gt;0.5,safe_distance_midpoint_acceptable&gt;0.5,intention_unmodeled_behaviour&gt;0.5,ample_time_acceptable&gt;0.5,role_towards_ship_0&lt;0.5)</definition>
+			<discretization>
+				<interval label="false" upper="0.5" />
+				<interval label="true" upper="1" />
+			</discretization>
+		</equation>
+	</nodes>
+	<extensions>
+		<genie version="1.0" app="GeNIe 3.0.6518.0 ACADEMIC" name="simplified">
+			<node id="Observation_applicable_towards_ship0">
+				<name>Observation applicable towards ship0</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>801 288 884 339</position>
+				<barchart active="true" width="128" height="108" />
+			</node>
+			<node id="safely_passed_ship_0">
+				<name>safely passed ship 0</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>494 535 570 582</position>
+				<barchart active="true" width="128" height="64" />
+			</node>
+			<node id="intention_unmodeled_behaviour">
+				<name>intention unmodeled behaviour</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>385 135 491 201</position>
+				<barchart active="true" width="128" height="64" />
+			</node>
+			<node id="role_towards_ship_0">
+				<name>role towards ship 0</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>1222 785 1326 850</position>
+				<barchart active="true" width="122" height="108" />
+			</node>
+			<node id="gives_way_correct_towards_ship0">
+				<name>gives way correct towards ship0</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>1256 325 1355 386</position>
+				<barchart active="true" width="128" height="108" />
+			</node>
+			<node id="stands_on_correct_towards_or_forced_to_give_way">
+				<name>stands on correct towards or forced to give way</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>917 555 1014 615</position>
+				<barchart active="true" width="128" height="108" />
+			</node>
+			<node id="change_in_course">
+				<name>change in course</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>877 899 972 958</position>
+				<barchart active="true" width="128" height="108" />
+			</node>
+			<node id="change_in_speed">
+				<name>change in speed</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>1058 907 1153 966</position>
+				<barchart active="true" width="128" height="108" />
+			</node>
+			<node id="colav_situation_towards_ship0">
+				<name>colav situation towards ship0</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>1478 801 1518 826</position>
+				<barchart active="true" width="128" height="108" />
+			</node>
+			<node id="priority_intention_to_ship0">
+				<name>priority intention to ship0</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>1209 1073 1258 1103</position>
+				<barchart active="true" width="128" height="72" />
+			</node>
+			<node id="GW_HO_correct_ship0">
+				<name>GW HO correct ship0</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>1484 126 1570 179</position>
+				<barchart active="true" width="128" height="108" />
+			</node>
+			<node id="GW_CR_PS_correct_ship0">
+				<name>GW CR_PS correct ship0</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>1473 231 1576 295</position>
+				<barchart active="true" width="128" height="108" />
+			</node>
+			<node id="GW_CR_SS_corerct_ship0">
+				<name>GW CR_SS corerct ship0</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>1476 377 1579 441</position>
+				<barchart active="true" width="128" height="108" />
+			</node>
+			<node id="GW_OT_en_correct_ship0">
+				<name>GW OT_en correct ship0</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>1474 508 1575 571</position>
+				<barchart active="true" width="128" height="108" />
+			</node>
+			<node id="GW_OT_ing_correct_ship0">
+				<name>GW OT_ing correct ship0</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>1532 642 1635 706</position>
+				<barchart active="true" width="128" height="108" />
+			</node>
+			<node id="two_times_distance_to_midpoint_at_cpa_to_ship0">
+				<name>two times distance to midpoint at cpa to ship0</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>1786 6 1882 66</position>
+				<barchart width="128" height="108" />
+			</node>
+			<node id="intention_safe_distance">
+				<name>intention safe distance</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>2083 215 2172 270</position>
+				<barchart width="128" height="108" />
+			</node>
+			<node id="safe_distance_to_midpoint_ship0">
+				<name>safe distance to midpoint ship0</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>1711 147 1807 207</position>
+				<barchart active="true" width="128" height="108" />
+			</node>
+			<node id="safe_distance_to_ship0">
+				<name>safe distance to ship0</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>1700 309 1796 369</position>
+				<barchart active="true" width="128" height="108" />
+			</node>
+			<node id="intention_colregs_compliant">
+				<name>intention colregs compliant</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>1079 126 1174 185</position>
+				<barchart active="true" width="128" height="64" />
+			</node>
+			<node id="GWC_or_pre_ample_time_towards_ship0">
+				<name>GWC or pre ample time towards ship0</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>1007 327 1115 394</position>
+				<barchart active="true" width="128" height="108" />
+			</node>
+			<node id="intention_ample_time">
+				<name>intention ample time</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>73 506 176 570</position>
+				<barchart width="128" height="558" />
+			</node>
+			<node id="is_pre_ample_time_to_ship0">
+				<name>is pre ample time to ship0</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>251 437 342 493</position>
+				<barchart active="true" width="128" height="108" />
+			</node>
+			<node id="time_untill_closest_point_of_approach_towards_ship0">
+				<name>time untill closest point of approach towards ship0</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>71 402 202 483</position>
+				<barchart width="66" height="378" />
+			</node>
+			<node id="distance_at_cpa_towards_ship_0">
+				<name>distance at cpa towards ship 0</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>2002 83 2133 164</position>
+				<barchart width="91" height="378" />
+			</node>
+			<node id="passed_ship0">
+				<name>passed ship0</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>417 623 497 673</position>
+			</node>
+			<node id="intention_good_seamanship">
+				<name>intention good seamanship</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>754 996 849 1055</position>
+			</node>
+			<node id="ample_time_acceptable">
+				<name>ample time acceptable</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>52 604 131 653</position>
+			</node>
+			<node id="safe_distance_acceptable">
+				<name>safe distance acceptable</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>2249 196 2345 256</position>
+			</node>
+			<node id="intention_safe_distance_midpoint">
+				<name>intention safe distance midpoint</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>1878 72 1981 137</position>
+				<barchart width="128" height="108" />
+			</node>
+			<node id="intention_safe_distance_front">
+				<name>intention safe distance front</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>2047 339 2150 404</position>
+				<barchart width="128" height="108" />
+			</node>
+			<node id="crossing_distance_front_towards_ship0">
+				<name>crossing distance front towards ship0</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>2001 464 2132 545</position>
+				<barchart width="91" height="378" />
+			</node>
+			<node id="safe_distance_at_CPA_towards_ship0">
+				<name>safe distance at CPA towards ship0</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>1886 220 1982 280</position>
+				<barchart active="true" width="128" height="108" />
+			</node>
+			<node id="safe_crossing_front_towards_ship0">
+				<name>safe crossing front towards ship0</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>1880 378 1976 438</position>
+				<barchart active="true" width="128" height="108" />
+			</node>
+			<node id="safe_distance_midpoint_acceptable">
+				<name>safe distance midpoint acceptable</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>1952 0 2048 60</position>
+			</node>
+			<node id="safe_distance_front_acceptable">
+				<name>safe distance front acceptable</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>2219 348 2315 408</position>
+			</node>
+			<node id="will_give_way_to_ship0">
+				<name>will give way to ship0</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>1887 1079 1963 1126</position>
+				<barchart active="true" width="128" height="64" />
+			</node>
+			<node id="observation_applicable">
+				<name>observation applicable</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>746 68 828 119</position>
+			</node>
+			<node id="has_turned_portwards">
+				<name>has turned portwards</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>608 686 687 735</position>
+			</node>
+			<node id="has_turned_starboardwards">
+				<name>has turned starboardwards</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>755 693 855 755</position>
+			</node>
+			<node id="has_turned_portwards_t_1">
+				<name>has turned portwards t-1</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>498 768 577 817</position>
+			</node>
+			<node id="has_turned_starboardwards_t_1">
+				<name>has turned starboardwards t-1</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>667 800 767 862</position>
+			</node>
+			<node id="good_seamanship">
+				<name>good seamanship</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>706 602 801 661</position>
+			</node>
+			<node id="stands_on_correct">
+				<name>stands on correct</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>927 708 1024 768</position>
+			</node>
+			<node id="intention_ignoring_safety">
+				<name>intention ignoring safety</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>1503 17 1592 72</position>
+			</node>
+			<node id="crossing_with_midpoint_on_side_ship0">
+				<name>crossing with midpoint on side ship0</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>1628 39 1759 95</position>
+			</node>
+			<node id="crossing_wiht_other_on_port_side_to_ship0">
+				<name>crossing wiht other on port side to ship0</name>
+				<interior color="339966" />
+				<outline color="003300" />
+				<font color="000000" name="Arial" size="8" />
+				<position>1712 689 1817 754</position>
+				<barchart active="true" width="128" height="78" />
+			</node>
+			<node id="is_changing_course">
+				<name>is_changing_course</name>
+				<interior color="339966" />
+				<outline color="003300" />
+				<font color="000000" name="Arial" size="8" />
+				<position>1103 234 1211 301</position>
+			</node>
+		</genie>
+	</extensions>
+</smile>
