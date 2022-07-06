@@ -152,17 +152,17 @@ INTENTION_INFERENCE::IntentionModelParameters setModelParameters(int num_ships){
 	param.ample_time_s.max = 1000;
 	param.ample_time_s.n_bins = 30; // this value must match the bayesian network
 	param.ample_time_s.minimal_accepted_by_ownship = 20;
-    param.safe_distance_m.mu = 15;
-	param.safe_distance_m.sigma = 2.5;
-	param.safe_distance_m.max = 30;
+    param.safe_distance_m.mu = 400;
+	param.safe_distance_m.sigma = 20;
+	param.safe_distance_m.max = 2000;
 	param.safe_distance_m.n_bins = 30; // this value must match the bayesian network
-	param.safe_distance_midpoint_m.mu = 15;
-	param.safe_distance_midpoint_m.sigma = 2.5;
-	param.safe_distance_midpoint_m.max = 30;
+	param.safe_distance_midpoint_m.mu = 600;
+	param.safe_distance_midpoint_m.sigma = 20;
+	param.safe_distance_midpoint_m.max = 2500;
 	param.safe_distance_midpoint_m.n_bins = 30; // this value must match the bayesian network
-	param.safe_distance_front_m.mu = 20;
-	param.safe_distance_front_m.sigma = 4;
-	param.safe_distance_front_m.max = 50;
+	param.safe_distance_front_m.mu = 50;
+	param.safe_distance_front_m.sigma = 10;
+	param.safe_distance_front_m.max = 200;
 	param.safe_distance_front_m.n_bins = 30; // this value must match the bayesian network
 	param.change_in_course_rad.minimal_change = 0.13;
 	param.change_in_speed_m_s.minimal_change = 1;
@@ -189,7 +189,7 @@ int main(){
     using namespace INTENTION_INFERENCE;
     
 	int num_ships = 2;
-    //std::string filename = "new_Case_LQLVS-60-sec.csv"; //crossing
+    std::string filename = "new_Case_LQLVS-60-sec.csv"; //crossing
     //std::string filename = "new_Case - 04-12-2019, 20-10-56 - DOTVP-two-ships-60-sec-kopi.csv";
     //std::string filename = "new_case_2ZC9Z-60-sec-two-ships.csv"; //head on
     //std::string filename = "new_Case - 01-08-2021, 08-21-29 - AQ5VM-60-sec-two-ships.csv"; //overtaking must start at timestep 4
@@ -197,9 +197,9 @@ int main(){
     //std::string filename = "new_Case - 01-09-2018, 01-11-37 - RT3LY-60-sec-two-ships-filled.csv"; //head-on
     //std::string filename = "new_Case - 01-09-2018, 01-45-02 - 19JNJ-60-sec-two-ships.csv";
     //std::string filename  = "new_Case - 01-11-2019, 02-30-00 - LP84U-60-sec.csv";
-    std::string filename  = "new_Case - 01-17-2018, 06-26-20 - W4H51-60-sec.csv";
+    //std::string filename  = "new_Case - 01-17-2018, 06-26-20 - W4H51-60-sec.csv";
 
-    std::string intentionModelFilename = "intention_model_two_ships.xdsl";
+    std::string intentionModelFilename = "intention_model_with_risk_of_collision.xdsl";
 
     std::vector<std::map<int, Eigen::Vector4d> > ship_state;
     std::vector<int> mmsi_vec;

@@ -33,8 +33,8 @@ namespace INTENTION_INFERENCE
 		std::map<int, std::string> ship_name_map;
 		std::vector<std::string> ship_names;
 		const std::vector<std::string> intention_node_names_ship_specific = {"colav_situation_towards_", "priority_intention_to_", "disable_"};
-		const std::vector<std::string> intention_node_names_general = {"intention_colregs_compliant", "intention_good_seamanship", "intention_safe_distance", "intention_safe_distance_front", "intention_safe_distance_midpoint", "intention_ample_time", "intention_ignoring_safety", "unmodelled_behaviour"};
-		const std::vector<std::string> intermediate_node_names_ship_specific = {"is_pre_ample_time_to_", "safe_distance_at_CPA_towards_", "safe_crossing_front_towards_", "safe_distance_to_", "safe_distance_to_midpoint_", "gives_way_correct_towards_", "Observation_applicable_towards_", "role_towards_", "good_seamanship_to_"};
+		const std::vector<std::string> intention_node_names_general = {"intention_colregs_compliant", "intention_good_seamanship", "intention_safe_distance", "intention_safe_distance_front", "intention_safe_distance_midpoint", "intention_ample_time", "intention_ignoring_safety", "unmodelled_behaviour","intention_distance_risk_of_collision","intention_distance_risk_of_collision_front"};
+		const std::vector<std::string> intermediate_node_names_ship_specific = {"is_pre_ample_time_to_", "safe_distance_at_CPA_towards_", "safe_crossing_front_towards_", "safe_distance_to_", "safe_distance_to_midpoint_", "gives_way_correct_towards_", "Observation_applicable_towards_", "role_towards_", "good_seamanship_to_","lowres_distance_at_cpa_towards_","lowres_crossing_distance_front_towards_"};
 		std::vector<std::string> intermediate_node_names_general = {"has_turned_portwards", "has_turned_starboardwards", "observation_applicable", "stands_on_correct"};
 		std::vector<std::string> all_node_names;
 		const std::string output_name = "observation_applicable";
@@ -89,6 +89,8 @@ namespace INTENTION_INFERENCE
 			auto intention_colregs_compliant = better_at(better_at(result, "intention_colregs_compliant"), "true");
 			intentionFile << intention_colregs_compliant << ",";
 			//std::cout << "intention_colregs_compliant: " << intention_colregs_compliant << std::endl;
+			auto intention_distance_risk_of_collision = better_at(better_at(result, "intention_distance_risk_of_collision"), "true");
+			std::cout << "intention_distance_risk_of_collision: " << intention_distance_risk_of_collision << std::endl;
 			auto intention_ignoring_safety = better_at(better_at(result, "intention_ignoring_safety"), "true");
 			auto intention_good_seamanship = better_at(better_at(result, "intention_good_seamanship"), "true");
 			intentionFile << intention_good_seamanship << ",";
@@ -236,8 +238,8 @@ namespace INTENTION_INFERENCE
 			}
 
 			//net.setPriorNormalDistribution("intention_ample_time", parameters.ample_time_s.mu, parameters.ample_time_s.sigma, parameters.ample_time_s.max / parameters.ample_time_s.n_bins);
-			//net.setPriorNormalDistribution("intention_safe_distance", parameters.safe_distance_m.mu, parameters.safe_distance_m.sigma, parameters.safe_distance_m.max / parameters.safe_distance_m.n_bins);
-			//net.setPriorNormalDistribution("intention_safe_distance_midpoint", parameters.safe_distance_midpoint_m.mu, parameters.safe_distance_midpoint_m.sigma, parameters.safe_distance_midpoint_m.max / parameters.safe_distance_midpoint_m.n_bins);
+			net.setPriorNormalDistribution("intention_distance_risk_of_collision", parameters.safe_distance_m.mu, parameters.safe_distance_m.sigma, parameters.safe_distance_m.max / parameters.safe_distance_m.n_bins);
+			net.setPriorNormalDistribution("intention_distance_risk_of_collision_front", parameters.safe_distance_midpoint_m.mu, parameters.safe_distance_midpoint_m.sigma, parameters.safe_distance_midpoint_m.max / parameters.safe_distance_midpoint_m.n_bins);
 
 			//int colreg_idx = 7;
 			//int cpa_ts_idx = 4;  // per nå lik r_maneuver_own (skal byttes til cpa_ts_idx)
