@@ -76,8 +76,13 @@ namespace INTENTION_INFERENCE
 			return false;
 		}
 
-		void evaluate_nodes(std::ofstream &intentionFile){
+		void evaluate_nodes(std::ofstream &intentionFile, double time, double x, double y){
 			int reference_ship_id = my_id;
+			std::cout<< my_id << std::endl;
+			intentionFile << my_id << ",";
+            intentionFile << x << ",";
+            intentionFile << y << ","; 
+            intentionFile << time << ",";
 
 			auto result = net.evaluateStates(all_node_names);
 
@@ -265,7 +270,7 @@ namespace INTENTION_INFERENCE
 			net.setAmpleTimeDistribution("intention_ample_time", "classified_west_5.csv", cpa_ample_time_idx, timestep, n_bins);
 		}
 
-		bool insertObservation(const IntentionModelParameters parameters, int &ot_en, const std::map<int, Eigen::Vector4d> ship_states, std::vector<int> currently_tracked_ships, bool is_changing_course, double time, std::ofstream &intentionFile)
+		bool insertObservation(const IntentionModelParameters parameters, int &ot_en, const std::map<int, Eigen::Vector4d> ship_states, std::vector<int> currently_tracked_ships, bool is_changing_course, double time, double x, double y, std::ofstream &intentionFile)
 		{
 
 			bool did_save = false;
@@ -347,7 +352,7 @@ namespace INTENTION_INFERENCE
 			}
 
 			net.setEvidence(output_name, "true");
-			evaluate_nodes(intentionFile);
+			evaluate_nodes(intentionFile, time, x, y);
 
 			return did_save;
 			

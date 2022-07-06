@@ -128,11 +128,7 @@ void writeIntentionToFile(int timestep, INTENTION_INFERENCE::IntentionModelParam
         int ot_en = 0;
         for(auto& [ship_id, current_ship_intention_model] : ship_intentions){
             std::cout << "ship_id" << ship_id << std::endl;
-            intentionFile << ship_id << ",";
-            intentionFile << x_vec[unique_time_vec.size()*j+i] << ",";
-            intentionFile << y_vec[unique_time_vec.size()*j+i] << ","; 
-            intentionFile << unique_time_vec[i] << ",";
-            current_ship_intention_model.insertObservation(parameters,ot_en, ship_state[i], ship_list, false, unique_time_vec[i], intentionFile);
+            current_ship_intention_model.insertObservation(parameters,ot_en, ship_state[i], ship_list, false, unique_time_vec[i], x_vec[unique_time_vec.size()*j+i], y_vec[unique_time_vec.size()*j+i], intentionFile); //writes intantion variables to file as well
             j++;
     }
    }
@@ -193,13 +189,15 @@ int main(){
     using namespace INTENTION_INFERENCE;
     
 	int num_ships = 2;
-    std::string filename = "new_Case_LQLVS-60-sec.csv"; //crossing
+    //std::string filename = "new_Case_LQLVS-60-sec.csv"; //crossing
     //std::string filename = "new_Case - 04-12-2019, 20-10-56 - DOTVP-two-ships-60-sec-kopi.csv";
     //std::string filename = "new_case_2ZC9Z-60-sec-two-ships.csv"; //head on
     //std::string filename = "new_Case - 01-08-2021, 08-21-29 - AQ5VM-60-sec-two-ships.csv"; //overtaking must start at timestep 4
     //std::string filename = "new_Case - 01-15-2020, 09-05-49 - VATEN-60-sec-two-ships.csv"; //overtaking
     //std::string filename = "new_Case - 01-09-2018, 01-11-37 - RT3LY-60-sec-two-ships-filled.csv"; //head-on
     //std::string filename = "new_Case - 01-09-2018, 01-45-02 - 19JNJ-60-sec-two-ships.csv";
+    //std::string filename  = "new_Case - 01-11-2019, 02-30-00 - LP84U-60-sec.csv";
+    std::string filename  = "new_Case - 01-17-2018, 06-26-20 - W4H51-60-sec.csv";
 
     std::string intentionModelFilename = "intention_model_two_ships.xdsl";
 
@@ -226,9 +224,10 @@ int main(){
 
    while (!inserted){
         for (int i = 0; i < num_ships; i++){
+            std::cout<< INTENTION_INFERENCE::better_at(ship_state[timestep], ship_list[1])[INTENTION_INFERENCE::PX]- INTENTION_INFERENCE::better_at(ship_state[timestep], ship_list[2])[INTENTION_INFERENCE::PX] << std::endl;
             double dist = evaluateDistance(INTENTION_INFERENCE::better_at(ship_state[timestep], ship_list[1])[INTENTION_INFERENCE::PX] - INTENTION_INFERENCE::better_at(ship_state[timestep], ship_list[2])[INTENTION_INFERENCE::PX], INTENTION_INFERENCE::better_at(ship_state[timestep], ship_list[1])[INTENTION_INFERENCE::PY] - INTENTION_INFERENCE::better_at(ship_state[timestep], ship_list[2])[INTENTION_INFERENCE::PY]);
             std::cout<< "dist: " << dist << std::endl;
-            if (dist < parameters.starting_distance){
+            if ((dist < parameters.starting_distance) && (sog_vec[timestep]>1) && (sog_vec[unique_time_vec.size()+timestep]>1)){
             ship_intentions.insert(std::pair<int, INTENTION_INFERENCE::IntentionModel>(ship_list[i], INTENTION_INFERENCE::IntentionModel(intentionModelFilename,parameters,ship_list[i],ship_state[timestep]))); //ship_state[1] as initial as first state might be NaN
             inserted = true;
             }
