@@ -655,6 +655,28 @@ namespace INTENTION_INFERENCE
 		return ample_time_cases;
 	} 
 
+	// alpha : contact angle at maneuver start, beta : relative bearing 
+	inline std::vector<double> relative_speed(std::vector<std::vector<std::string> > content, int own_speed_idx, int obst_speed_idx, int alpha_idx){
+		std::vector<double> relative_speeds;
+		for(int i=0; i < content.size(); i++){
+			std::string own_speed = content[i][own_speed_idx], obst_speed = content[i][obst_speed_idx], alpha = content[i][alpha_idx];
+			double v_h = stod(obst_speed) * cos(stod(alpha)* M_PI / 180.0) - stod(own_speed);
+			double v_v = stod(obst_speed) * sin(stod(alpha)*M_PI / 180.0);
+			double v_rel = sqrt(pow(v_h,2) + pow(v_v,2));
+			relative_speeds.push_back(v_rel);
+		}
+		return relative_speeds;
+	}
 
+	inline std::vector<double> mean_length(std::vector<std::vector<std::string> > content, int own_length_idx, int obst_length_idx){
+		std::vector<double> mean_lengths;
+		for(int i=0; i < content.size(); i++){
+			std::string own_length = content[i][own_length_idx], obst_length = content[i][obst_length_idx];
+			double mean_length = (stod(own_length) + stod(obst_length))/2;
+			mean_lengths.push_back(mean_length);
+		}
+		return mean_lengths;
+	}
+	
 
 } // namespace INTENTION_INFERENCE
