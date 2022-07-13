@@ -234,17 +234,14 @@ namespace INTENTION_INFERENCE
 			//net.setPriorNormalDistribution("intention_safe_distance", parameters.safe_distance_m.mu, parameters.safe_distance_m.sigma, parameters.safe_distance_m.max / parameters.safe_distance_m.n_bins);
 			//net.setPriorNormalDistribution("intention_safe_distance_midpoint", parameters.safe_distance_midpoint_m.mu, parameters.safe_distance_midpoint_m.sigma, parameters.safe_distance_midpoint_m.max / parameters.safe_distance_midpoint_m.n_bins);
 
-			//int colreg_idx = 7;
-			//int cpa_ts_idx = 4;  // per nå lik r_maneuver_own (skal byttes til cpa_ts_idx)
-
-			net.setPriorNormalDistribution("intention_safe_distance_front", parameters.safe_distance_front_m.mu, parameters.safe_distance_front_m.sigma, parameters.safe_distance_front_m.max / parameters.safe_distance_front_m.n_bins);
+			//net.setPriorNormalDistribution("intention_safe_distance_front", parameters.safe_distance_front_m.mu, parameters.safe_distance_front_m.sigma, parameters.safe_distance_front_m.max / parameters.safe_distance_front_m.n_bins);
 
 			
 
 			// MOVE LATER
-			int cpa_dist_idx = 6;
-			int colreg_idx = 7;
-			int cpa_ample_time_idx = 8;
+			//int cpa_dist_idx = 6;
+			//int colreg_idx = 7;
+			//int cpa_ample_time_idx = 8;
 
 			int timestep = 60;
 			int n_bins = 30;
@@ -253,16 +250,23 @@ namespace INTENTION_INFERENCE
 			int head_on = 3;
 			int overtake = -2;
 			int crossing = -1;
-
+			
+			std::string filename = "classified_west_5.csv";
+			int cpa_dist_idx = find_indexes(filename, "r_cpa");
+			int colreg_idx = find_indexes(filename, "COLREG");
+			int cpa_ample_time_idx = find_indexes(filename, "pre_man_t_cpa_own");
 
 			// Cpa distance
-			net.setAisDistribution("intention_safe_distance_midpoint", "classified_west_5.csv", colreg_idx, cpa_dist_idx, multiply, n_bins, head_on);
-			net.setAisDistribution("intention_safe_distance", "classified_west_5.csv", colreg_idx, cpa_dist_idx, multiply, n_bins, overtake);
+			net.setAisDistribution("intention_safe_distance_midpoint", filename, colreg_idx, cpa_dist_idx, multiply, n_bins, head_on);
+			net.setAisDistribution("intention_safe_distance", filename, colreg_idx, cpa_dist_idx, multiply, n_bins, overtake);
+			
+			// Normal distributed 
+			net.setPriorNormalDistribution("intention_safe_distance_front", parameters.safe_distance_front_m.mu, parameters.safe_distance_front_m.sigma, parameters.safe_distance_front_m.max / parameters.safe_distance_front_m.n_bins);
 			//net.setAisDistribution("intention_safe_distance_front", "classified_west_5.csv", colreg_idx, cpa_dist_idx, multiply, n_bins, crossing);
 			
 			// Cpa time, the model does NOT differ for the different situations
 
-			net.setAmpleTimeDistribution("intention_ample_time", "classified_west_5.csv", cpa_ample_time_idx, timestep, n_bins);
+			net.setAmpleTimeDistribution("intention_ample_time", filename, cpa_ample_time_idx, timestep, n_bins);
 		}
 
 		bool insertObservation(const IntentionModelParameters parameters, int &ot_en, const std::map<int, Eigen::Vector4d> ship_states, std::vector<int> currently_tracked_ships, bool is_changing_course, double time, std::ofstream &intentionFile)

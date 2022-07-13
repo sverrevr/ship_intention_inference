@@ -572,9 +572,23 @@ namespace INTENTION_INFERENCE
 		return max;
 	}
 
+	inline int find_indexes(std::string filename, std::string name){
+		std::vector<std::vector<std::string> > content = read_file(filename);
+		int idx = -1;
+		std::vector<std::string> names = content[0];
+		for(int i =0; i < names.size(); i++){
+			if (names[i] == name){
+				idx = i;
+				}
+			}
+		if (idx == -1){
+			std::cout << " Index not found. ";
+		}
+		return idx;
+		}
+
 	inline std::map<int, std::vector<double> > aisMap(std::vector<std::vector<std::string> > content, int colreg_idx, int cpa_idx, int timestep){
 		std::map<int, std::vector<double> > ais_cases;
-	
 		for(int i=1;i<content.size();i++){   //start at 1 to not include name 
 			std::string colreg_situation = content[i][colreg_idx];
 			int col = stoi(colreg_situation);
@@ -616,7 +630,6 @@ namespace INTENTION_INFERENCE
 
 		double tot_sum = 0;
 		tot_sum = std::accumulate(instance_count_vec.begin(), instance_count_vec.end(),0);
-		
 		std::vector<double> dist(num_intervals, 0);
 		double dist_sum = 0;
 		for(int i=0; i<num_intervals;i++){
@@ -633,18 +646,17 @@ namespace INTENTION_INFERENCE
 
 	inline std::map<int, std::vector<double> > distributionMap(std::map<int, std::vector<double> > ais_map, int n_bins){
 		std::map<int, std::vector<double> > distributionMap;
-		for(std::map<int, std::vector<double> >::iterator it=ais_map.begin(); it != ais_map.end(); ++it){
-				int col = (*it).first;
-				std::vector<double> inVect = (*it).second;
-				std::vector<double> dist = find_distribution(inVect, n_bins);
-				distributionMap[col] = dist;
-			}
+		for(auto const& x : distributionMap){
+            int col = x.first;
+            std::vector<double> inVect = x.second;
+            std::vector<double> dist = find_distribution(inVect, n_bins);
+			distributionMap[col] = dist;
+        }
 		return distributionMap;
 	}
 
 	inline std::vector<double> ampleTimeVec(std::vector<std::vector<std::string> > content, int ample_time_idx, int timestep){
 		std::vector<double> ample_time_cases;
-		
 		for(int i=1;i<content.size();i++){   //start at 1 to not include name 
 			
 			std::string ample_time_val = content[i][ample_time_idx];
@@ -677,6 +689,8 @@ namespace INTENTION_INFERENCE
 		}
 		return mean_lengths;
 	}
+
+	
 	
 
 } // namespace INTENTION_INFERENCE

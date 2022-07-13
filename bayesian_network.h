@@ -200,6 +200,17 @@ public:
         // CPT = distr_map[-2];
         std::cout << "\n Distribution added for colreg sit (" <<col_sit<<") :\n" ;
         double sum = 0;
+        for(auto const& x : distr_cpa_map){
+            int col = x.first;
+            std::vector<double> inVect = x.second;
+            if(col == col_sit){
+                for(int i=0; i < CPT.GetSize()-1; ++i){
+                    CPT[i]= inVect[i];
+                    std::cout << CPT[i] << " ";
+                    sum += CPT[i];
+                }
+            }
+        }/*
         for(std::map<int, std::vector<double> >::iterator it=distr_cpa_map.begin(); it != distr_cpa_map.end(); ++it){
             int col = (*it).first;
             std::vector<double> inVect = (*it).second;
@@ -210,7 +221,7 @@ public:
                     sum += CPT[i];
                 }
             }
-        }
+        }*/
         if(sum<0.9999 || sum>1.0001 || !isfinite(sum)){
             double error = 1.0000-sum;
             CPT[CPT.GetSize()-1] +=  error;

@@ -127,7 +127,7 @@ void writeIntentionToFile(int timestep, INTENTION_INFERENCE::IntentionModelParam
         int j= 0;
         int ot_en = 0;
         for(auto& [ship_id, current_ship_intention_model] : ship_intentions){
-            std::cout << "ship_id" << ship_id << std::endl;
+            std::cout << "ship_id " << ship_id << std::endl;
             intentionFile << ship_id << ",";
             intentionFile << x_vec[unique_time_vec.size()*j+i] << ",";
             intentionFile << y_vec[unique_time_vec.size()*j+i] << ","; 
