@@ -239,12 +239,10 @@ namespace INTENTION_INFERENCE
 
 			net.setPriorNormalDistribution("intention_safe_distance_front", parameters.safe_distance_front_m.mu, parameters.safe_distance_front_m.sigma, parameters.safe_distance_front_m.max / parameters.safe_distance_front_m.n_bins);
 
-			
+			int cpa_dist_idx = find_indexes("classified_west_5.csv", "r_cpa");
+			int colreg_idx = find_indexes("classified_west_5.csv", "COLREG");
+			int cpa_ample_time_idx = find_indexes("classified_west_5.csv", "pre_man_t_cpa_own");
 
-			// MOVE LATER
-			int cpa_dist_idx = 6;
-			int colreg_idx = 7;
-			int cpa_ample_time_idx = 8;
 
 			int timestep = 60;
 			int n_bins = 30;

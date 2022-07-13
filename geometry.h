@@ -572,6 +572,21 @@ namespace INTENTION_INFERENCE
 		return max;
 	}
 
+	inline int find_indexes(std::string filename, std::string name){
+		std::vector<std::vector<std::string> > content = read_file(filename);
+		int idx = -1;
+		std::vector<std::string> names = content[0];
+		for(int i =0; i < names.size(); i++){
+			if (names[i] == name){
+				idx = i;
+				}
+			}
+		if (idx == -1){
+			std::cout << " Index not found. ";
+		}
+		return idx;
+		}
+
 	inline std::map<int, std::vector<double> > aisMap(std::vector<std::vector<std::string> > content, int colreg_idx, int cpa_idx, int timestep){
 		std::map<int, std::vector<double> > ais_cases;
 	
